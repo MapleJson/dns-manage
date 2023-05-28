@@ -51,11 +51,11 @@ class Admin extends AdminController
     /**
      * 保存更新的资源
      *
-     * @param Ad $model
      * @return \think\Response
      */
-    public function update(Ad $model)
+    public function update()
     {
+        $model = new Ad();
         $admin = $model->getById(intval(input('get.id')));
         if (!$admin->isExists()) {
             return message('The agent does not exist');

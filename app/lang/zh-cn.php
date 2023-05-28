@@ -22,6 +22,7 @@ return [
     'Edit successfully'                           => '修改成功',
     'Edit Failed'                                 => '修改失败',
 
+    'The data does not exist'                     => '该条数据不存在',
     'The admin does not exist'                    => '该管理员不存在',
     'Admin modified successfully'                 => '管理员修改成功',
     'Admin modification failed'                   => '管理员修改失败',
@@ -29,6 +30,18 @@ return [
     'useStatus' => [
         1 => '正常',
         2 => '停用',
+    ],
+
+    'type' => [
+        1 => '后端服务器',
+        2 => '节点服务器',
+    ],
+
+    'siteStatus' => [
+        1 => '开发中',
+        2 => '准备好',
+        3 => '已上线',
+        4 => '已下线',
     ],
 
 ];

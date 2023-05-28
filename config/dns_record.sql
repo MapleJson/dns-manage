@@ -22,20 +22,20 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 DROP TABLE IF EXISTS `admin`;
 CREATE TABLE `admin`  (
-  `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `username` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '用户名',
-  `nickname` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '昵称',
-  `password` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '密码',
-  `salt` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '密码盐',
-  `loginfailure` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '失败次数',
-  `logintime` int UNSIGNED NULL DEFAULT NULL COMMENT '登录时间',
-  `create_time` int UNSIGNED NULL DEFAULT NULL COMMENT '创建时间',
-  `update_time` int UNSIGNED NULL DEFAULT NULL COMMENT '更新时间',
-  `token` varchar(59) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'Session标识',
-  `status` tinyint UNSIGNED NOT NULL DEFAULT 1 COMMENT '状态',
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `username`(`username` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '管理员表' ROW_FORMAT = Dynamic;
+    `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+    `username` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '用户名',
+    `nickname` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '昵称',
+    `password` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '密码',
+    `salt` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '密码盐',
+    `loginfailure` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '失败次数',
+    `logintime` int UNSIGNED NULL DEFAULT NULL COMMENT '登录时间',
+    `create_time` int UNSIGNED NULL DEFAULT NULL COMMENT '创建时间',
+    `update_time` int UNSIGNED NULL DEFAULT NULL COMMENT '更新时间',
+    `token` varchar(59) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'Session标识',
+    `status` tinyint UNSIGNED NOT NULL DEFAULT 1 COMMENT '状态',
+    PRIMARY KEY (`id`) USING BTREE,
+    UNIQUE INDEX `username`(`username` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '管理员表';
 
 -- ----------------------------
 -- Records of admin
@@ -47,15 +47,15 @@ INSERT INTO `admin` VALUES (1, 'admin', 'Admin', '7fd7809fd939c49dccfe71cffc73fe
 -- ----------------------------
 DROP TABLE IF EXISTS `domains`;
 CREATE TABLE `domains`  (
-  `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `domain` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '域名',
-  `site_name` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '站点名称',
-  `zone_identifier` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '域名的域ID',
-  `remark` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '备注',
-  `create_time` int UNSIGNED NULL DEFAULT NULL COMMENT '创建时间',
-  `update_time` int UNSIGNED NULL DEFAULT NULL COMMENT '更新时间',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '域名表' ROW_FORMAT = Dynamic;
+    `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    `domain` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '域名',
+    `site_name` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '站点名称',
+    `zone_identifier` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '域名的域ID',
+    `remark` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '备注',
+    `create_time` int UNSIGNED NULL DEFAULT NULL COMMENT '创建时间',
+    `update_time` int UNSIGNED NULL DEFAULT NULL COMMENT '更新时间',
+    PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '域名表';
 
 -- ----------------------------
 -- Records of domains
@@ -66,17 +66,17 @@ CREATE TABLE `domains`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `records`;
 CREATE TABLE `records`  (
-  `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `domain_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '域名',
-  `type` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '解析类型 A CNAME',
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '记录名称',
-  `content` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '记录内容 A记录是ip CNAME记录是域名',
-  `comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '备注',
-  `identifier` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '记录ID',
-  `create_time` int UNSIGNED NULL DEFAULT NULL COMMENT '创建时间',
-  `update_time` int UNSIGNED NULL DEFAULT NULL COMMENT '更新时间',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '域名对应解析记录表' ROW_FORMAT = Dynamic;
+    `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    `domain_id` int UNSIGNED NOT NULL COMMENT '域名id',
+    `type` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '解析类型 A CNAME',
+    `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '记录名称',
+    `content` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '记录内容 A记录是ip CNAME记录是域名',
+    `comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '备注',
+    `identifier` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '记录ID',
+    `create_time` int UNSIGNED NULL DEFAULT NULL COMMENT '创建时间',
+    `update_time` int UNSIGNED NULL DEFAULT NULL COMMENT '更新时间',
+    PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '域名对应解析记录表';
 
 -- ----------------------------
 -- Records of records
@@ -87,15 +87,36 @@ CREATE TABLE `records`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `servers`;
 CREATE TABLE `servers`  (
-  `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `server_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '服务器名称',
-  `public_ip` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '外网ip',
-  `private_ip` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '内网ip',
-  `remark` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '备注',
-  `create_time` int UNSIGNED NULL DEFAULT NULL COMMENT '创建时间',
-  `update_time` int UNSIGNED NULL DEFAULT NULL COMMENT '更新时间',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '服务器表' ROW_FORMAT = Dynamic;
+    `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    `server_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '服务器名称',
+    `public_ip` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '外网ip',
+    `private_ip` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '内网ip',
+    `type` tinyint UNSIGNED  NOT NULL DEFAULT 1 COMMENT '服务器类型 1后端 2节点',
+    `remark` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '备注',
+    `create_time` int UNSIGNED NULL DEFAULT NULL COMMENT '创建时间',
+    `update_time` int UNSIGNED NULL DEFAULT NULL COMMENT '更新时间',
+    PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '服务器表';
+
+-- ----------------------------
+-- Records of servers
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for servers
+-- ----------------------------
+DROP TABLE IF EXISTS `sites`;
+CREATE TABLE `sites`  (
+    `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    `site_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '站点名称',
+    `server_id` int UNSIGNED NOT NULL COMMENT '后端服务器id',
+    `a_domain_id` int UNSIGNED NOT NULL COMMENT 'A记录域名id',
+    `front_server_id` int UNSIGNED NOT NULL COMMENT '节点服务器id',
+    `remark` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '备注',
+    `create_time` int UNSIGNED NULL DEFAULT NULL COMMENT '创建时间',
+    `update_time` int UNSIGNED NULL DEFAULT NULL COMMENT '更新时间',
+    PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '服务器表';
 
 -- ----------------------------
 -- Records of servers

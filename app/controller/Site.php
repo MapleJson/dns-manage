@@ -4,15 +4,16 @@ declare (strict_types=1);
 namespace app\controller;
 
 use app\AdminController;
-use app\model\Domains;
+use app\model\Sites;
 
-class Domain extends AdminController
+class Site extends AdminController
 {
     protected function initialize()
     {
         parent::initialize();
-        $this->model = new Domains();
+        $this->model = new Sites();
     }
+
     /**
      * 显示资源列表
      *
@@ -25,8 +26,12 @@ class Domain extends AdminController
         if (!empty(input('get.ip'))) {
             $where[] = ['ip', 'like', '%' . trim(input('get.ip')) . '%'];
         }
-        $list = Domains::getPageList($where);
-        return $this->view('list', compact('list'));
+        if (!empty(input('get.type'))) {
+            $where[] = ['type', '=', intval(input('get.type'))];
+        }
+        $list = Sites::getPageList($where);
+        $siteStatus = lang('siteStatus');
+        return $this->view('list', compact('list', 'siteStatus'));
     }
 
 }

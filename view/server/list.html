@@ -1,6 +1,6 @@
 {extend name='common/layout' /}
 
-{block name='title'}管理员列表{/block}
+{block name='title'}服务器列表{/block}
 
 {block name='css'}
 <!-- DataTables -->
@@ -14,16 +14,16 @@
 {/block}
 
 {block name='search'}
-<form action="{:url('admin-index')}" method="get">
+<form action="{:url('server-index')}" method="get">
     <div class="form-row">
         <div class="col-md-1 mb-3">
-            <input type="text" class="form-control" name="username" placeholder="用户名" value="{$Request.param.username}">
+            <input type="text" class="form-control" name="ip" placeholder="IP" value="{$Request.param.ip}">
         </div>
         <div class="col-md-1 mb-3">
             <select class="form-control select2" name="status">
-                <option value="">状态</option>
-                {foreach $status as $key => $val}
-                <option {if $Request.param.status == $key}selected{/if}
+                <option value="">类型</option>
+                {foreach $type as $key => $val}
+                <option {if $Request.param.type == $key}selected{/if}
                 value="{$key}">{$val}</option>
                 {/foreach}
             </select>
@@ -52,26 +52,19 @@
 {/block}
 
 {block name='tbody'}
-{volist name='list' id='admin'}
+{volist name='list' id='server'}
 <tr class="text-center">
-    <td>{$admin.id}</td>
-    <td>{$admin.username}</td>
-    <td>{$admin.nickname}</td>
-    <td>{$admin.loginip}</td>
-    <td>{:date('Y-m-d H:i:s', $admin.logintime)}</td>
-    <td>{$admin.create_time}</td>
-    <td class="{if $admin.status === 1}text-success{else /}text-danger{/if}">
-        {$status[$admin.status]}
+    <td>{$server.id}</td>
+    <td>{$server.username}</td>
+    <td>{$server.nickname}</td>
+    <td>{$server.loginip}</td>
+    <td class="{if $server.type === 1}text-success{else /}text-danger{/if}">
+        {$type[$server.type]}
     </td>
+    <td>{$server.create_time}</td>
     <td class="text-center">
-        {if $admin.id !== session('admin.id')}
-            <a class="btn btn-info btn-sm" href="{:url('admin-reset', ['id' => $admin.id])}">重置密码</a>
-            {if $admin.status === 1}
-            <a class="btn btn-danger btn-sm" href="{:url('admin-update', ['id' => $admin.id, 'status' => 2])}">停用</a>
-            {else /}
-            <a class="btn btn-success btn-sm" href="{:url('admin-update', ['id' => $admin.id, 'status' => 1])}">启用</a>
-            {/if}
-        {/if}
+        <a class="btn btn-info btn-sm" href="{:url('server-update', ['id' => $server.id])}">编辑</a>
+        <a class="btn btn-success btn-sm" href="{:url('server-delete', ['id' => $server.id])}">删除</a>
     </td>
 </tr>
 {/volist}
@@ -98,34 +91,40 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">添加管理员</h5>
+                <h5 class="modal-title">添加服务器</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form action="{:url('admin-create')}" method="POST" id="add-admin-form" role="form">
+                <form action="{:url('server-create')}" method="POST" id="add-data-form" role="form">
                     {:token_field()}
                     <div class="row form-row">
                         <div class="col-12">
                             <div class="form-group">
-                                <label>用户名</label>
+                                <label>服务器名称</label>
                                 <div>
-                                    <input type="text" name="username" autocomplete="off" class="form-control">
+                                    <input type="text" name="server_name" autocomplete="off" class="form-control">
                                 </div>
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="form-group">
-                                <label>昵称</label>
-                                <input type="text" name="nickname" autocomplete="off" class="form-control">
+                                <label>外网ip</label>
+                                <input type="text" name="public_ip" autocomplete="off" class="form-control">
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="form-group">
-                                <label>密码</label>
+                                <label>内网ip</label>
+                                <input type="text" name="private_ip" autocomplete="off" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label>备注</label>
                                 <div>
-                                    <input type="password" name="password" autocomplete="off" class="form-control">
+                                    <textarea name="remark" autocomplete="off" class="form-control"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -161,9 +160,9 @@
 <script>
     $(function () {
         // validate start
-        validateOption.rules = addAgentFormRule;
-        validateOption.messages = addAgentFormMsg;
-        $('#add-admin-form').validate(validateOption);
+        // validateOption.rules = addAgentFormRule;
+        // validateOption.messages = addAgentFormMsg;
+        // $('#add-data-form').validate(validateOption);
         // validate end
     });
 </script>

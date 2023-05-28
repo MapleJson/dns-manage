@@ -31,6 +31,13 @@ abstract class BaseController
      */
     protected $auth = null;
 
+    /**
+     * 模型
+     *
+     * @var mixed
+     */
+    protected $model = null;
+
 
     /**
      * 是否批量验证
