@@ -1,0 +1,170 @@
+{extend name='common/layout' /}
+
+{block name='title'}管理员列表{/block}
+
+{block name='css'}
+<!-- DataTables -->
+<link rel="stylesheet" href="/static/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="/static/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+<!-- Select2 -->
+<link rel="stylesheet" href="/static/plugins/select2/css/select2.min.css">
+<link rel="stylesheet" href="/static/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+<!-- SweetAlert2 -->
+<link rel="stylesheet" href="/static/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
+{/block}
+
+{block name='search'}
+<form action="{:url('admin-index')}" method="get">
+    <div class="form-row">
+        <div class="col-md-1 mb-3">
+            <input type="text" class="form-control" name="username" placeholder="用户名" value="{$Request.param.username}">
+        </div>
+        <div class="col-md-1 mb-3">
+            <select class="form-control select2" name="status">
+                <option value="">状态</option>
+                {foreach $status as $key => $val}
+                <option {if $Request.param.status == $key}selected{/if}
+                value="{$key}">{$val}</option>
+                {/foreach}
+            </select>
+        </div>
+        <div class="col-md-1 mb-3">
+            <button class="btn btn-primary" type="submit">搜索</button>
+        </div>
+        <div class="col-md-1 mb-3">
+            <button class="btn btn-success" data-toggle="modal" data-target="#add-agent" type="button">新增</button>
+        </div>
+    </div>
+</form>
+{/block}
+
+{block name='thead'}
+<tr class="text-center">
+    <th>编号</th>
+    <th>用户名</th>
+    <th>昵称</th>
+    <th>登录IP</th>
+    <th>登录时间</th>
+    <th>创建时间</th>
+    <th>当前状态</th>
+    <th>操作</th>
+</tr>
+{/block}
+
+{block name='tbody'}
+{volist name='list' id='admin'}
+<tr class="text-center">
+    <td>{$admin.id}</td>
+    <td>{$admin.username}</td>
+    <td>{$admin.nickname}</td>
+    <td>{$admin.loginip}</td>
+    <td>{:date('Y-m-d H:i:s', $admin.logintime)}</td>
+    <td>{$admin.create_time}</td>
+    <td class="{if $admin.status === 1}text-success{else /}text-danger{/if}">
+        {$status[$admin.status]}
+    </td>
+    <td class="text-center">
+        {if $admin.id !== session('admin.id')}
+            <a class="btn btn-info btn-sm" href="{:url('admin-reset', ['id' => $admin.id])}">重置密码</a>
+            {if $admin.status === 1}
+            <a class="btn btn-danger btn-sm" href="{:url('admin-update', ['id' => $admin.id, 'status' => 2])}">停用</a>
+            {else /}
+            <a class="btn btn-success btn-sm" href="{:url('admin-update', ['id' => $admin.id, 'status' => 1])}">启用</a>
+            {/if}
+        {/if}
+    </td>
+</tr>
+{/volist}
+{/block}
+
+{block name='page'}
+<div class="row mt-4">
+    <div class="col-sm-12 col-md-5">
+        <div class="dataTables_info" id="DataTables_Table_0_info" role="status" aria-live="polite">
+            每页展示20条数据，共{$list->total()}条数据
+        </div>
+    </div>
+    <div class="col-sm-12 col-md-7">
+        <div class="dataTables_paginate paging_simple_numbers">
+            {$list|raw}
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name='dialog'}
+<!-- Add Details Modal -->
+<div class="modal fade" id="add-agent" aria-hidden="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">添加管理员</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{:url('admin-create')}" method="POST" id="add-admin-form" role="form">
+                    {:token_field()}
+                    <div class="row form-row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label>用户名</label>
+                                <div>
+                                    <input type="text" name="username" autocomplete="off" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label>昵称</label>
+                                <input type="text" name="nickname" autocomplete="off" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label>密码</label>
+                                <div>
+                                    <input type="password" name="password" autocomplete="off" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="submit" class="btn btn-primary">确认</button>
+                        <button type="reset" class="btn btn-danger">重置</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Add Details Modal -->
+{/block}
+
+{block name='script'}
+<!-- DataTables -->
+<script src="/static/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="/static/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="/static/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+<script src="/static/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+<!-- jquery-validation -->
+<script src="/static/plugins/jquery-validation/jquery.validate.min.js"></script>
+<script src="/static/plugins/jquery-validation/additional-methods.min.js"></script>
+<!-- Select2 -->
+<script src="/static/plugins/select2/js/select2.full.min.js"></script>
+<!-- SweetAlert2 -->
+<script src="/static/plugins/sweetalert2/sweetalert2.min.js"></script>
+<!-- validate rule -->
+<script src="/static/js/validate.js"></script>
+<script>
+    $(function () {
+        // validate start
+        validateOption.rules = addAgentFormRule;
+        validateOption.messages = addAgentFormMsg;
+        $('#add-admin-form').validate(validateOption);
+        // validate end
+    });
+</script>
+{/block}

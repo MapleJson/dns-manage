@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+    <title>提示</title>
+<!--    &lt;!&ndash; Theme style &ndash;&gt;-->
+    <link rel="stylesheet" href="/static/css/adminlte.min.css">
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="error-page">
+
+<!-- Main Wrapper -->
+<div class="main-wrapper">
+
+    <div class="error-box">
+        {if $wait === 1}
+        <h3 class="h2 mb-3 text-success"><i class="fa fa-check-square"></i>{$message}</h3>
+        {else /}
+        <h3 class="h2 mb-3 text-danger"><i class="fa fa-warning"></i>{$message}</h3>
+        {/if}
+        <p class="h4 font-weight-normal">当前页面还有<span id="wait">{$wait}</span>秒跳转至上一个页面</p>
+        <a href="{:url('home')}" class="btn btn-primary">返回主页</a>
+    </div>
+
+</div>
+<!-- /Main Wrapper -->
+
+<script type="text/javascript">
+    (function () {
+        var wait = document.getElementById('wait');
+        var interval = setInterval(function () {
+            var time = --wait.innerHTML;
+            if (time <= 0) {
+                location.href = history.length <= 1 ? "{:url('home')}" : '{$url}';
+                clearInterval(interval);
+            }
+        }, 1000);
+    })();
+</script>
+
+</body>
+</html>
