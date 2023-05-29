@@ -38,4 +38,4 @@ deploy-job(main):
   # 任务脚本
   script:
     # 检查编译后的文件是否存在
-    - /usr/bin/rsync -vzrtopg --omit-dir-times --delete --exclude ".git" --exclude ".env" --exclude "public/uploads"  --exclude "runtime" ./ /opt/www/dnsManage/
+    - /usr/bin/rsync -vzrtopg --omit-dir-times --delete --exclude ".git" --exclude ".env" --exclude "runtime" --exclude "public/uploads"  --exclude "runtime" ./ /opt/www/dnsManage/
