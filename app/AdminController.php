@@ -28,8 +28,7 @@ class AdminController extends BaseController
         if (session('admin.username') !== 'admin') {
             return message('无权操作');
         }
-        $result = $this->model->create(input());
-        if ($result->id) {
+        if ($this->model->save(input())) {
             return message('Submitted successfully', false);
         }
         return message('Submission Failed');
