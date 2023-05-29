@@ -122,8 +122,8 @@ EOF;
         file_put_contents($backendConfPath, $backendConf);
         file_put_contents($frontendConfPath, $frontendConf);
         // 传输Nginx配置文件命令
-        $scpBack = "scp {$backendConfPath} root@{$site->servers->public_ip}:/etc/nginx/conf.d/";
-        $scpFront = "scp {$frontendConfPath} root@{$site->frontServers->public_ip}:/etc/nginx/conf.d/";
+        $scpBack = "scp {$backendConfPath} root@{$site->servers->public_ip}:/etc/nginx/conf.d/{$random}.conf";
+        $scpFront = "scp {$frontendConfPath} root@{$site->frontServers->public_ip}:/etc/nginx/conf.d/{$random}.conf";
         // 程序依赖安装
         $install = "cd {$site->base_path} && composer install";
         // 发布代码
@@ -147,6 +147,7 @@ EOF;
                 'type' => 'A',
                 'name' => $adminDomain,
                 'content' => $site->servers->public_ip,
+                'comment' => $site->site_name . '后台',
                 'proxied' => true,
             ],
             [
@@ -161,6 +162,7 @@ EOF;
                 'type' => 'A',
                 'name' => $frontDomain,
                 'content' => $site->frontServers->public_ip,
+                'comment' => $site->site_name . '前台',
                 'proxied' => true,
             ],
             [
@@ -177,6 +179,7 @@ EOF;
                 'type' => $backendDns['result']['type'],
                 'name' => $backendDns['result']['name'],
                 'content' => $backendDns['result']['content'],
+                'comment' => $backendDns['result']['comment'],
                 'identifier' => $backendDns['result']['id'],
             ]);
             $site->backend_domain = $backendDns['result']['name'];
@@ -189,10 +192,12 @@ EOF;
                 'type' => $frontendDns['result']['type'],
                 'name' => $frontendDns['result']['name'],
                 'content' => $frontendDns['result']['content'],
+                'comment' => $frontendDns['result']['comment'],
                 'identifier' => $frontendDns['result']['id'],
             ]);
             $site->front_a_record_id = $frontRecord->id;
         }
+        $site->private_domain = "{$random}.self";
         $site->save();
 
         $exec = [
