@@ -16,14 +16,12 @@ Route::group(function () {
     // 服务器管理
     Route::get('server/index', 'server/index')->name('server-index');
     Route::post('server/create', 'server/save')->name('server-create');
-    Route::get('server/info/{id}', 'server/info')->name('server-info');
     Route::post('server/update', 'server/update')->name('server-update');
     Route::get('server/delete', 'server/delete')->name('server-delete');
 
     // 域名管理
     Route::get('domain/index', 'domain/index')->name('domain-index');
     Route::post('domain/create', 'domain/save')->name('domain-create');
-    Route::get('domain/info/{id}', 'domain/info')->name('domain-info');
     Route::post('domain/update', 'domain/update')->name('domain-update');
     Route::get('domain/delete', 'domain/delete')->name('domain-delete');
 
@@ -35,7 +33,6 @@ Route::group(function () {
     // 站点管理
     Route::get('site/index', 'site/index')->name('site-index');
     Route::post('site/create', 'site/save')->name('site-create');
-    Route::get('site/info/{id}', 'site/info')->name('site-info');
     Route::post('site/update', 'site/update')->name('site-update');
     Route::get('site/deploy', 'site/deploy')->name('site-deploy');
     Route::get('site/delete', 'site/delete')->name('site-delete');

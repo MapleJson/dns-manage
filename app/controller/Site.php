@@ -47,7 +47,9 @@ class Site extends AdminController
             $item->server = empty($item->servers) ? '' : $item->servers->server_name;
             $item->frontServer = empty($item->frontServers) ? '' : $item->frontServers->server_name;
             $item->aDomain = empty($item->domains) ? '' : $item->domains->domain;
-            $item->aDns = empty($item->records) ? '' : $item->records->name;
+            $item->aBackDns = empty($item->backRecords) ? '' : $item->backRecords->name;
+            $item->aFrontDns = empty($item->frontRecords) ? '' : $item->frontRecords->name;
+            $item->webDomains = explode(' ', $item->web_domains);
         }
         $domains = Domains::field('id, domain')->select()->column(null, 'id');
         $servers = Servers::field('id, server_name')->where('type', 1)->select()->column(null, 'id');
@@ -57,7 +59,138 @@ class Site extends AdminController
 
     public function deploy()
     {
-        return message('success');
+        if (session('admin.username') !== 'admin') {
+            return message('无权操作');
+        }
+        $site = $this->model->getById(intval(input('get.id')));
+        if (!$site->isExists()) {
+            return message('The data does not exist');
+        }
+        $random = substr(md5($site->site_name . uuid()), 0, 8);
+        $adminDomain = "admin{$random}";
+        $frontDomain = "front{$random}";
+        $backendConf =
+<<<EOF
+server {
+        listen       80;
+    server_name  {$random}.self {$adminDomain}.{$site->domains->domain};
+    root         "{$site->origin_path}/public";
+    index index.php index.html;
+
+    location ~* (runtime|application)/{
+            return 403;
+        }
+    location / {
+            if (!-e \$request_filename){
+                rewrite  ^(.*)$  /index.php?s=\$1 last; break;
+        }
+    }
+    location ~ \.php(.*)$ {
+        fastcgi_hide_header X-Powered-By;
+        fastcgi_pass   127.0.0.1:9000;
+        fastcgi_index  index.php;
+        fastcgi_split_path_info  ^((?U).+\.php)(/?.+)$;
+        fastcgi_param  SCRIPT_FILENAME  \$document_root\$fastcgi_script_name;
+        fastcgi_param  PATH_INFO  \$fastcgi_path_info;
+        fastcgi_param  PATH_TRANSLATED  \$document_root\$fastcgi_path_info;
+        include        fastcgi_params;
+    }
+    access_log  /var/log/nginx/{$random}.log;
+    error_log  /var/log/nginx/{$random}.error.log;
+}
+EOF;
+        $frontendConf =
+<<<EOF
+server {
+    listen       80;
+    server_name  {$site->web_domains};
+    location / {
+        proxy_pass http://{$random}.self;
+        proxy_set_header X-Read-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    }
+    access_log  /var/log/nginx/{$random}.log;
+    error_log  /var/log/nginx/{$random}.error.log;
+}
+EOF;
+        // 写Nginx配置文件
+        $backendConfPath = runtime_path("nginx/{$random}/backend.conf");
+        $frontendConfPath = runtime_path("nginx/{$random}/frontend.conf");
+        file_put_contents($backendConfPath, $backendConf);
+        file_put_contents($frontendConfPath, $frontendConf);
+        // 传输Nginx配置文件命令
+        $scpBack = "scp {$backendConfPath} root@{$site->servers->public_ip}:/etc/nginx/conf.d/";
+        $scpFront = "scp {$frontendConfPath} root@{$site->frontServers->public_ip}:/etc/nginx/conf.d/";
+        // 程序依赖安装
+        $install = "cd {$site->base_path} && composer install";
+        // 发布代码
+        $rsync = "/usr/bin/rsync -vzrtopg --omit-dir-times --delete --exclude \".git\" --exclude \".gitignore\" --exclude \".env\" --exclude \"runtime\" {$site->base_path}/ root@{$site->servers->public_ip}:{$site->origin_path}/";
+        // 远程执行后端服务器命令
+        $backSsh = "ssh root@{$site->servers->public_ip} \"chown nginx.nginx {$site->origin_path} -R;nginx -s reload\"";
+
+        $backIps = explode('.', $site->servers->private_ip);
+        $frontIps = explode('.', $site->frontServers->private_ip);
+        // 判断是否同一内网  远程执行节点服务器命令
+        if ("{$backIps[0]}{$backIps[1]}{$backIps[2]}" === "{$frontIps[0]}{$frontIps[1]}{$frontIps[2]}") {
+            $frontSsh = "ssh root@{$site->frontServers->public_ip} \"echo \"{$site->servers->private_ip}      {$random}.self\" >> /etc/hosts;nginx -s reload\"";
+        } else {
+            $frontSsh = "ssh root@{$site->frontServers->public_ip} \"echo \"{$site->servers->public_ip}      {$random}.self\" >> /etc/hosts;nginx -s reload\"";
+        }
+
+        $backResult = curl_http(
+            "https://api.cloudflare.com/client/v4/zones/{$site->domains->zone_identifier}/dns_records",
+            true,
+            [
+                'type' => 'A',
+                'name' => $adminDomain,
+                'content' => $site->servers->public_ip,
+                'proxied' => true,
+            ],
+            [
+                'Authorization: Bearer ' . env('cf.auth_key'),
+                'Content-Type: application/json'
+            ]
+        );
+        $frontResult = curl_http(
+            "https://api.cloudflare.com/client/v4/zones/{$site->domains->zone_identifier}/dns_records",
+            true,
+            [
+                'type' => 'A',
+                'name' => $frontDomain,
+                'content' => $site->frontServers->public_ip,
+                'proxied' => true,
+            ],
+            [
+                'Authorization: Bearer ' . env('cf.auth_key'),
+                'Content-Type: application/json'
+            ]
+        );
+        $backendDns = json_decode($backResult, true);
+        $frontendDns = json_decode($frontResult, true);
+        if ($backendDns['success']) {
+            $backRecord = Records::create([
+                'domain_id' => $site->a_domain_id,
+                'site_id' => $site->id,
+                'type' => $backendDns['result']['type'],
+                'name' => $backendDns['result']['name'],
+                'content' => $backendDns['result']['content'],
+                'identifier' => $backendDns['result']['id'],
+            ]);
+            $site->backend_domain = $backendDns['result']['name'];
+            $site->back_a_record_id = $backRecord->id;
+        }
+        if ($frontendDns['success']) {
+            $frontRecord = Records::create([
+                'domain_id' => $site->a_domain_id,
+                'site_id' => $site->id,
+                'type' => $frontendDns['result']['type'],
+                'name' => $frontendDns['result']['name'],
+                'content' => $frontendDns['result']['content'],
+                'identifier' => $frontendDns['result']['id'],
+            ]);
+            $site->front_a_record_id = $frontRecord->id;
+        }
+        $site->save();
     }
 
 }

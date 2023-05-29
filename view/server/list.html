@@ -34,7 +34,7 @@
             <button class="btn btn-primary" type="submit">搜索</button>
         </div>
         <div class="col-md-1 mb-3">
-            <button class="btn btn-success" data-toggle="modal" data-target="#add-agent" type="button">新增</button>
+            <button class="btn btn-success" data-toggle="modal" data-target="#add-server" type="button">新增</button>
         </div>
     </div>
 </form>
@@ -66,8 +66,8 @@
     </td>
     <td>{$server.create_time}</td>
     <td class="text-center">
-        <a class="btn btn-info btn-sm" href="{:url('server-update', ['id' => $server.id])}">编辑</a>
-        <a class="btn btn-success btn-sm" href="{:url('server-delete', ['id' => $server.id])}">删除</a>
+        <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#add-server" onclick="showUpdate({$server})" type="button">编辑</button>
+        <a class="btn btn-danger btn-sm" href="{:url('server-delete', ['id' => $server.id])}">删除</a>
     </td>
 </tr>
 {/volist}
@@ -90,11 +90,11 @@
 
 {block name='dialog'}
 <!-- Add Details Modal -->
-<div class="modal fade" id="add-agent" aria-hidden="true" role="dialog">
+<div class="modal fade" id="add-server" aria-hidden="true" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">添加服务器</h5>
+                <h5 class="modal-title">添加/编辑-服务器</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -102,6 +102,7 @@
             <div class="modal-body">
                 <form action="{:url('server-create')}" method="POST" id="add-data-form" role="form">
                     {:token_field()}
+                    <input type="hidden" value="0" name="id" />
                     <div class="row form-row">
                         <div class="col-12">
                             <div class="form-group">
@@ -181,12 +182,15 @@
 <!-- validate rule -->
 <script src="/static/js/validate.js"></script>
 <script>
-    $(function () {
-        // validate start
-        // validateOption.rules = addAgentFormRule;
-        // validateOption.messages = addAgentFormMsg;
-        // $('#add-data-form').validate(validateOption);
-        // validate end
-    });
+
+    function showUpdate(data) {
+        $('#add-data-form').attr('action', '{:url("server-update")}')
+        $('#add-data-form input[name=id]').val(data.id)
+        $('#add-data-form input[name=server_name]').val(data.server_name)
+        $('#add-data-form input[name=public_ip]').val(data.public_ip)
+        $('#add-data-form input[name=private_ip]').val(data.private_ip)
+        $('#add-data-form textarea[name=remark]').val(data.remark)
+        $('#add-data-form :radio[name=type][value=' + data.type +']').prop('checked', true)
+    }
 </script>
 {/block}

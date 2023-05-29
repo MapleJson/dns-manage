@@ -56,7 +56,7 @@
     <td>{$domain.domain}</td>
     <td>{$domain.create_time}</td>
     <td class="text-center">
-        <a class="btn btn-info btn-sm" href="{:url('domain-update', ['id' => $domain.id])}">编辑</a>
+        <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#add-domain" onclick="showUpdate({$domain})" type="button">编辑</button>
         <a class="btn btn-danger btn-sm" href="{:url('domain-delete', ['id' => $domain.id])}">删除</a>
     </td>
 </tr>
@@ -84,7 +84,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">添加域名</h5>
+                <h5 class="modal-title">添加/编辑-域名</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -92,6 +92,7 @@
             <div class="modal-body">
                 <form action="{:url('domain-create')}" method="POST" id="add-domain-form" role="form">
                     {:token_field()}
+                    <input type="hidden" value="0" name="id" />
                     <div class="row form-row">
                         <div class="col-12">
                             <div class="form-group">
@@ -151,12 +152,13 @@
 <!-- validate rule -->
 <script src="/static/js/validate.js"></script>
 <script>
-    $(function () {
-        // validate start
-        // validateOption.rules = adddomainFormRule;
-        // validateOption.messages = adddomainFormMsg;
-        // $('#add-domain-form').validate(validateOption);
-        // validate end
-    });
+    function showUpdate(data) {
+        $('#add-domain-form').attr('action', '{:url("site-update")}')
+        $('#add-domain-form input[name=id]').val(data.id)
+        $('#add-domain-form input[name=domain]').val(data.domain)
+        $('#add-domain-form textarea[name=remark]').val(data.remark)
+        $('#add-domain-form select[name=site_id] option[value=' + data.site_id +']').attr('selected', true)
+        $('#add-domain-form select').select2()
+    }
 </script>
 {/block}

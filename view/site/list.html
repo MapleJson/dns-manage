@@ -76,7 +76,8 @@
     <th>后端服务器</th>
     <th>节点服务器</th>
     <th>A记录域名</th>
-    <th>A记录DNS名</th>
+    <th>后台A记录DNS名</th>
+    <th>前台A记录DNS名</th>
     <th>站点状态</th>
     <th>创建时间</th>
     <th>操作</th>
@@ -92,14 +93,16 @@
     <td>{$site.server}</td>
     <td>{$site.frontServer}</td>
     <td>{$site.aDomain}</td>
-    <td>{$site.aDns}</td>
-    <td class="{if $site.status === 1}text-blue{elseif $site.status === 2}text-dark{elseif $site.status === 3}text-success{else/}text-danger{/if}">
+    <td>{$site.aBackDns}</td>
+    <td>{$site.aFrontDns}</td>
+    <td class="{if $site.status === 1}text-blue{elseif $site.status === 2}text-info{elseif $site.status === 3}text-success{else/}text-danger{/if}">
         {$siteStatus[$site.status]}
     </td>
     <td>{$site.create_time}</td>
     <td class="text-center">
-        <a class="btn btn-success btn-sm" href="{:url('site-deploy', ['id' => $site.id])}">部署</a>
-        <a class="btn btn-success btn-sm" href="{:url('site-update', ['id' => $site.id])}">编辑</a>
+        <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#show-site" onclick="showUrl({$site})" type="button">查看域名</button>
+        <a class="btn btn-warning btn-sm" href="{:url('site-deploy', ['id' => $site.id])}">部署</a>
+        <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#add-site" onclick="showUpdate({$site})" type="button">编辑</button>
         <a class="btn btn-danger btn-sm" href="{:url('site-delete', ['id' => $site.id])}">删除</a>
     </td>
 </tr>
@@ -124,10 +127,10 @@
 {block name='dialog'}
 <!-- Add Details Modal -->
 <div class="modal fade" id="add-site" aria-hidden="true" role="dialog">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">添加站点</h5>
+                <h5 class="modal-title">添加/编辑-站点</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -135,16 +138,9 @@
             <div class="modal-body">
                 <form action="{:url('site-create')}" method="POST" id="add-data-form" role="form">
                     {:token_field()}
+                    <input type="hidden" value="0" name="id" />
                     <div class="row form-row">
-                        <div class="col-12">
-                            <div class="form-group">
-                                <label>站点名称</label>
-                                <div>
-                                    <input type="text" name="site_name" autocomplete="off" class="form-control">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12">
+                        <div class="col-6">
                             <div class="form-group">
                                 <label>后端服务器</label>
                                 <select class="form-control select2" name="server_id">
@@ -156,7 +152,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-12">
+                        <div class="col-6">
                             <div class="form-group">
                                 <label>节点服务器</label>
                                 <select class="form-control select2" name="front_server_id">
@@ -168,10 +164,10 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-12">
+                        <div class="col-6">
                             <div class="form-group">
                                 <label>A记录域名</label>
-                                <select class="form-control select2" name="domain_id">
+                                <select class="form-control select2" name="a_domain_id">
                                     <option value="0">请选择域名</option>
                                     {volist name='domains' id='domain'}
                                     <option {if $Request.param.domain_id == $domain.id}selected{/if}
@@ -180,15 +176,35 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-12">
+                        <div class="col-6">
                             <div class="form-group">
-                                <label>自定义域名</label>
+                                <label>站点状态</label>
+                                <select class="form-control select2" name="status">
+                                    <option value="0">请选择状态</option>
+                                    {foreach $siteStatus as $key => $val}
+                                    <option {if $Request.param.status == $key}selected{/if}
+                                    value="{$key}">{$val}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>站点名称</label>
                                 <div>
-                                    <input type="text" name="private_domain" autocomplete="off" class="form-control">
+                                    <input type="text" name="site_name" autocomplete="off" class="form-control">
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>后台域名</label>
+                                <div>
+                                    <input type="text" name="backend_domain" placeholder="新增时可不填" autocomplete="off" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
                             <div class="form-group">
                                 <label>项目本地路径</label>
                                 <div>
@@ -196,19 +212,11 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12">
+                        <div class="col-6">
                             <div class="form-group">
                                 <label>项目远程路径</label>
                                 <div>
                                     <input type="text" name="origin_path" autocomplete="off" class="form-control">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="form-group">
-                                <label>后台域名</label>
-                                <div>
-                                    <input type="text" name="backend_domain" autocomplete="off" class="form-control">
                                 </div>
                             </div>
                         </div>
@@ -228,18 +236,6 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12">
-                            <div class="form-group">
-                                <label>站点状态</label>
-                                <select class="form-control select2" name="status">
-                                    <option value="0">请选择状态</option>
-                                    {foreach $siteStatus as $key => $val}
-                                    <option {if $Request.param.status == $key}selected{/if}
-                                    value="{$key}">{$val}</option>
-                                    {/foreach}
-                                </select>
-                            </div>
-                        </div>
                     </div>
                     <div class="modal-footer justify-content-between">
                         <button type="submit" class="btn btn-primary">确认</button>
@@ -252,6 +248,35 @@
     </div>
 </div>
 <!-- /Add Details Modal -->
+<!-- Show Details Modal -->
+<div class="modal fade" id="show-site" aria-hidden="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><span id="site-name"></span>--站点域名</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label>管理后台</label>
+                        <div>
+                            <a href="" id="backend-url" target="_blank"></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <label>用户前台</label>
+                        <div id="frontend-url"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {/block}
 
 {block name='script'}
@@ -270,12 +295,31 @@
 <!-- validate rule -->
 <script src="/static/js/validate.js"></script>
 <script>
-    $(function () {
-        // validate start
-        // validateOption.rules = addsiteFormRule;
-        // validateOption.messages = addsiteFormMsg;
-        // $('#add-data-form').validate(validateOption);
-        // validate end
-    });
+    function showUrl(data) {
+        var frontUrlHtml = ''
+        data.webDomains.forEach(function (item) {
+            frontUrlHtml += `<p><a href="https://${item}" target="_blank">https://${item}</a></p>`
+        })
+        $('#site-name').text(data.site_name)
+        $('#backend-url').attr('href', 'https://' + data.backend_domain)
+        $('#backend-url').text('https://' + data.backend_domain)
+        $('#frontend-url').html(frontUrlHtml)
+    }
+    function showUpdate(data) {
+        $('#add-data-form').attr('action', '{:url("site-update")}')
+        $('#add-data-form input[name=id]').val(data.id)
+        $('#add-data-form input[name=site_name]').val(data.site_name)
+        $('#add-data-form input[name=private_domain]').val(data.private_domain)
+        $('#add-data-form input[name=base_path]').val(data.base_path)
+        $('#add-data-form input[name=origin_path]').val(data.origin_path)
+        $('#add-data-form input[name=backend_domain]').val(data.backend_domain)
+        $('#add-data-form input[name=web_domains]').val(data.web_domains)
+        $('#add-data-form textarea[name=remark]').val(data.remark)
+        $('#add-data-form select[name=server_id] option[value=' + data.server_id +']').attr('selected', true)
+        $('#add-data-form select[name=front_server_id] option[value=' + data.front_server_id +']').attr('selected', true)
+        $('#add-data-form select[name=a_domain_id] option[value=' + data.a_domain_id +']').attr('selected', true)
+        $('#add-data-form select[name=status] option[value=' + data.status +']').attr('selected', true)
+        $('#add-data-form select').select2()
+    }
 </script>
 {/block}

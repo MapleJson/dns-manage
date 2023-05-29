@@ -25,9 +25,14 @@ class Sites extends BaseModel
         return $this->belongsTo(Domains::class, 'a_domain_id', 'id');
     }
 
-    public function records()
+    public function backRecords()
     {
-        return $this->belongsTo(Records::class, 'a_record_id', 'id');
+        return $this->belongsTo(Records::class, 'back_a_record_id', 'id');
+    }
+
+    public function frontRecords()
+    {
+        return $this->belongsTo(Records::class, 'front_a_record_id', 'id');
     }
 
 
