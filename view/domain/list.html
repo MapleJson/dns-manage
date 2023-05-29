@@ -43,6 +43,7 @@
     <th>编号</th>
     <th>站点名称</th>
     <th>域名</th>
+    <th>备注</th>
     <th>创建时间</th>
     <th>操作</th>
 </tr>
@@ -54,6 +55,7 @@
     <td>{$domain.id}</td>
     <td>{$domain.site_name}</td>
     <td>{$domain.domain}</td>
+    <td>{$domain.remark}</td>
     <td>{$domain.create_time}</td>
     <td class="text-center">
         <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#add-domain" onclick="showUpdate({$domain})" type="button">编辑</button>

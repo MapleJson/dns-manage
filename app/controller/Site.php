@@ -191,6 +191,16 @@ EOF;
             $site->front_a_record_id = $frontRecord->id;
         }
         $site->save();
+
+        $exec = [
+            'scpBack' => shell_exec($scpBack),
+            'scpFront' => shell_exec($scpFront),
+            'install' => shell_exec($install),
+            'rsync' => shell_exec($rsync),
+            'backSsh' => shell_exec($backSsh),
+            'frontSsh' => shell_exec($frontSsh),
+        ];
+        halt($exec);
     }
 
 }
