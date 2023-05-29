@@ -114,8 +114,8 @@ server {
 }
 EOF;
         // 写Nginx配置文件
-        $backendConfPath = runtime_path("nginx/{$random}/backend.conf");
-        $frontendConfPath = runtime_path("nginx/{$random}/frontend.conf");
+        $backendConfPath = runtime_path("nginx/{$random}") . 'backend.conf';
+        $frontendConfPath = runtime_path("nginx/{$random}") . 'frontend.conf';
         file_put_contents($backendConfPath, $backendConf);
         file_put_contents($frontendConfPath, $frontendConf);
         // 传输Nginx配置文件命令
