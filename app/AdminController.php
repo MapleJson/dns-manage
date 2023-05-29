@@ -25,7 +25,10 @@ class AdminController extends BaseController
      */
     public function save()
     {
-        $result = $this->model->create(input('post'));
+        if (session('admin.username') !== 'admin') {
+            return message('无权操作');
+        }
+        $result = $this->model->create(input());
         if ($result->id) {
             return message('Submitted successfully', false);
         }
@@ -39,12 +42,15 @@ class AdminController extends BaseController
      */
     public function update()
     {
+        if (session('admin.username') !== 'admin') {
+            return message('无权操作');
+        }
         $data = $this->model->getById(intval(input('post.id')));
         if (!$data->isExists()) {
             return message('The data does not exist');
         }
 
-        $result = $this->model->update(input('post'), ['id' => intval(input('post.id'))]);
+        $result = $this->model->update(input(), ['id' => intval(input('post.id'))]);
         if ($result) {
             return message('Edit successfully', false);
         }
@@ -57,6 +63,9 @@ class AdminController extends BaseController
      */
     public function delete()
     {
+        if (session('admin.username') !== 'admin') {
+            return message('无权操作');
+        }
         if ($this->model->where('id', intval(input('get.id')))->delete()) {
             return message('Delete successfully', false);
         }

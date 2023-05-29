@@ -14,25 +14,25 @@
 {/block}
 
 {block name='search'}
-<form action="{:url('admin-index')}" method="get">
+<form action="{:url('domain-index')}" method="get">
     <div class="form-row">
-        <div class="col-md-1 mb-3">
-            <input type="text" class="form-control" name="username" placeholder="用户名" value="{$Request.param.username}">
+        <div class="col-md-2 mb-3">
+            <input type="text" class="form-control" name="domain" placeholder="域名" value="{$Request.param.domain}">
         </div>
-        <div class="col-md-1 mb-3">
-            <select class="form-control select2" name="status">
-                <option value="">状态</option>
-                {foreach $status as $key => $val}
-                <option {if $Request.param.status == $key}selected{/if}
-                value="{$key}">{$val}</option>
-                {/foreach}
+        <div class="col-md-2 mb-3">
+            <select class="form-control select2" name="site_id">
+                <option value="">站点</option>
+                {volist name='sites' id='site'}
+                <option {if $Request.param.site_id== $site.id}selected{/if}
+                value="{$site.id}">{$site.site_name}</option>
+                {/volist}
             </select>
         </div>
         <div class="col-md-1 mb-3">
             <button class="btn btn-primary" type="submit">搜索</button>
         </div>
         <div class="col-md-1 mb-3">
-            <button class="btn btn-success" data-toggle="modal" data-target="#add-agent" type="button">新增</button>
+            <button class="btn btn-success" data-toggle="modal" data-target="#add-domain" type="button">新增</button>
         </div>
     </div>
 </form>
@@ -41,37 +41,23 @@
 {block name='thead'}
 <tr class="text-center">
     <th>编号</th>
-    <th>用户名</th>
-    <th>昵称</th>
-    <th>登录IP</th>
-    <th>登录时间</th>
+    <th>站点名称</th>
+    <th>域名</th>
     <th>创建时间</th>
-    <th>当前状态</th>
     <th>操作</th>
 </tr>
 {/block}
 
 {block name='tbody'}
-{volist name='list' id='admin'}
+{volist name='list' id='domain'}
 <tr class="text-center">
-    <td>{$admin.id}</td>
-    <td>{$admin.username}</td>
-    <td>{$admin.nickname}</td>
-    <td>{$admin.loginip}</td>
-    <td>{:date('Y-m-d H:i:s', $admin.logintime)}</td>
-    <td>{$admin.create_time}</td>
-    <td class="{if $admin.status === 1}text-success{else /}text-danger{/if}">
-        {$status[$admin.status]}
-    </td>
+    <td>{$domain.id}</td>
+    <td>{$domain.site_name}</td>
+    <td>{$domain.domain}</td>
+    <td>{$domain.create_time}</td>
     <td class="text-center">
-        {if $admin.id !== session('admin.id')}
-            <a class="btn btn-info btn-sm" href="{:url('admin-reset', ['id' => $admin.id])}">重置密码</a>
-            {if $admin.status === 1}
-            <a class="btn btn-danger btn-sm" href="{:url('admin-update', ['id' => $admin.id, 'status' => 2])}">停用</a>
-            {else /}
-            <a class="btn btn-success btn-sm" href="{:url('admin-update', ['id' => $admin.id, 'status' => 1])}">启用</a>
-            {/if}
-        {/if}
+        <a class="btn btn-info btn-sm" href="{:url('domain-update', ['id' => $domain.id])}">编辑</a>
+        <a class="btn btn-danger btn-sm" href="{:url('domain-delete', ['id' => $domain.id])}">删除</a>
     </td>
 </tr>
 {/volist}
@@ -94,38 +80,44 @@
 
 {block name='dialog'}
 <!-- Add Details Modal -->
-<div class="modal fade" id="add-agent" aria-hidden="true" role="dialog">
+<div class="modal fade" id="add-domain" aria-hidden="true" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">添加管理员</h5>
+                <h5 class="modal-title">添加域名</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form action="{:url('admin-create')}" method="POST" id="add-admin-form" role="form">
+                <form action="{:url('domain-create')}" method="POST" id="add-domain-form" role="form">
                     {:token_field()}
                     <div class="row form-row">
                         <div class="col-12">
                             <div class="form-group">
-                                <label>用户名</label>
+                                <label>域名</label>
                                 <div>
-                                    <input type="text" name="username" autocomplete="off" class="form-control">
+                                    <input type="text" name="domain" autocomplete="off" class="form-control">
                                 </div>
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="form-group">
-                                <label>昵称</label>
-                                <input type="text" name="nickname" autocomplete="off" class="form-control">
+                                <label>站点</label>
+                                <select class="form-control select2" name="site_id">
+                                    <option value="0">请选择站点</option>
+                                    {volist name='sites' id='site'}
+                                    <option {if $Request.param.site_id== $site.id}selected{/if}
+                                    value="{$site.id}">{$site.site_name}</option>
+                                    {/volist}
+                                </select>
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="form-group">
-                                <label>密码</label>
+                                <label>备注</label>
                                 <div>
-                                    <input type="password" name="password" autocomplete="off" class="form-control">
+                                    <textarea name="remark" autocomplete="off" class="form-control"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -161,9 +153,9 @@
 <script>
     $(function () {
         // validate start
-        validateOption.rules = addAgentFormRule;
-        validateOption.messages = addAgentFormMsg;
-        $('#add-admin-form').validate(validateOption);
+        // validateOption.rules = adddomainFormRule;
+        // validateOption.messages = adddomainFormMsg;
+        // $('#add-domain-form').validate(validateOption);
         // validate end
     });
 </script>

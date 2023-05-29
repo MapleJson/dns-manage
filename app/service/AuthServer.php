@@ -65,7 +65,6 @@ class AuthServer
         }
         $admin->loginfailure = 0;
         $admin->logintime = time();
-        $admin->loginip = request()->ip();
         $admin->token = uuid();
         $admin->save();
         session('admin', $admin->toArray());
@@ -97,7 +96,6 @@ class AuthServer
         if ($this->logged) {
             return true;
         }
-//        halt(session('admin'));
         if (!session('?admin')) {
             return false;
         }
@@ -108,11 +106,6 @@ class AuthServer
             $this->logout();
             return false;
         }
-        //判断管理员IP是否变动
-//        if (!isset($admin['loginip']) || $admin['loginip'] != request()->ip()) {
-//            $this->logout();
-//            return false;
-//        }
         $this->logged = true;
         return true;
     }

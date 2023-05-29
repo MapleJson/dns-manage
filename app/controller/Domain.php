@@ -5,6 +5,7 @@ namespace app\controller;
 
 use app\AdminController;
 use app\model\Domains;
+use app\model\Sites;
 
 class Domain extends AdminController
 {
@@ -22,11 +23,18 @@ class Domain extends AdminController
     public function index()
     {
         $where = [];
-        if (!empty(input('get.ip'))) {
-            $where[] = ['ip', 'like', '%' . trim(input('get.ip')) . '%'];
+        if (!empty(input('get.domain'))) {
+            $where[] = ['domain', 'like', '%' . trim(input('get.domain')) . '%'];
+        }
+        if (!empty(input('get.site_id'))) {
+            $where[] = ['site_id', '=', intval(input('get.site_id'))];
         }
         $list = Domains::getPageList($where);
-        return $this->view('list', compact('list'));
+        foreach ($list as &$item) {
+            $item->site_name = empty($item->sites) ? '' : $item->sites->site_name;
+        }
+        $sites = Sites::field('id, site_name')->select()->column(null, 'id');
+        return $this->view('list', compact('list', 'sites'));
     }
 
 }

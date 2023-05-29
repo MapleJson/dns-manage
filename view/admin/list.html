@@ -43,7 +43,6 @@
     <th>编号</th>
     <th>用户名</th>
     <th>昵称</th>
-    <th>登录IP</th>
     <th>登录时间</th>
     <th>创建时间</th>
     <th>当前状态</th>
@@ -57,7 +56,6 @@
     <td>{$admin.id}</td>
     <td>{$admin.username}</td>
     <td>{$admin.nickname}</td>
-    <td>{$admin.loginip}</td>
     <td>{:date('Y-m-d H:i:s', $admin.logintime)}</td>
     <td>{$admin.create_time}</td>
     <td class="{if $admin.status === 1}text-success{else /}text-danger{/if}">

@@ -10,5 +10,9 @@ use app\BaseModel;
  */
 class Domains extends BaseModel
 {
+    public function sites()
+    {
+        return $this->belongsTo(Sites::class, 'site_id', 'id');
+    }
 
 }

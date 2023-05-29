@@ -16,25 +16,34 @@ Route::group(function () {
     // 服务器管理
     Route::get('server/index', 'server/index')->name('server-index');
     Route::post('server/create', 'server/save')->name('server-create');
-    Route::put('server/update', 'server/update')->name('server-update');
+    Route::get('server/info/{id}', 'server/info')->name('server-info');
+    Route::post('server/update', 'server/update')->name('server-update');
     Route::get('server/delete', 'server/delete')->name('server-delete');
 
     // 域名管理
     Route::get('domain/index', 'domain/index')->name('domain-index');
-    Route::post('domain/create', 'domain/create')->name('domain-create');
-    Route::post('domain/save', 'domain/save')->name('domain-save');
-    Route::put('domain/update', 'domain/update')->name('domain-update');
+    Route::post('domain/create', 'domain/save')->name('domain-create');
+    Route::get('domain/info/{id}', 'domain/info')->name('domain-info');
+    Route::post('domain/update', 'domain/update')->name('domain-update');
+    Route::get('domain/delete', 'domain/delete')->name('domain-delete');
 
     // DNS记录
-    Route::get('dns/index', 'dns/index')->name('dns-index');
-    Route::get('dns/create', 'dns/create')->name('dns-create');
-    Route::post('dns/save', 'dns/save')->name('dns-save');
-    Route::put('dns/update', 'dns/update')->name('dns-update');
+    Route::get('record/index', 'record/index')->name('record-index');
+    Route::post('record/create', 'record/save')->name('record-create');
+    Route::get('record/delete', 'record/delete')->name('record-delete');
+
+    // 站点管理
+    Route::get('site/index', 'site/index')->name('site-index');
+    Route::post('site/create', 'site/save')->name('site-create');
+    Route::get('site/info/{id}', 'site/info')->name('site-info');
+    Route::post('site/update', 'site/update')->name('site-update');
+    Route::get('site/deploy', 'site/deploy')->name('site-deploy');
+    Route::get('site/delete', 'site/delete')->name('site-delete');
 
     // 管理员管理
     Route::get('admin/index', 'admin/index')->name('admin-index');
     Route::post('admin/create', 'admin/save')->name('admin-create');
-    Route::put('admin/update', 'admin/update')->name('admin-update');
+    Route::get('admin/update', 'admin/update')->name('admin-update');
     Route::get('admin/reset', 'admin/reset')->name('admin-reset');
 
     // 个人信息

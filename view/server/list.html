@@ -11,16 +11,18 @@
 <link rel="stylesheet" href="/static/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
 <!-- SweetAlert2 -->
 <link rel="stylesheet" href="/static/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
+<!-- iCheck for checkboxes and radio inputs -->
+<link rel="stylesheet" href="/static/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
 {/block}
 
 {block name='search'}
 <form action="{:url('server-index')}" method="get">
     <div class="form-row">
-        <div class="col-md-1 mb-3">
-            <input type="text" class="form-control" name="ip" placeholder="IP" value="{$Request.param.ip}">
+        <div class="col-md-2 mb-3">
+            <input type="text" class="form-control" name="public_ip" placeholder="外网IP" value="{$Request.param.public_ip}">
         </div>
         <div class="col-md-1 mb-3">
-            <select class="form-control select2" name="status">
+            <select class="form-control select2" name="type">
                 <option value="">类型</option>
                 {foreach $type as $key => $val}
                 <option {if $Request.param.type == $key}selected{/if}
@@ -41,12 +43,12 @@
 {block name='thead'}
 <tr class="text-center">
     <th>编号</th>
-    <th>用户名</th>
-    <th>昵称</th>
-    <th>登录IP</th>
-    <th>登录时间</th>
+    <th>服务器名</th>
+    <th>外网IP</th>
+    <th>内网IP</th>
+    <th>备注</th>
+    <th>类型</th>
     <th>创建时间</th>
-    <th>当前状态</th>
     <th>操作</th>
 </tr>
 {/block}
@@ -55,9 +57,10 @@
 {volist name='list' id='server'}
 <tr class="text-center">
     <td>{$server.id}</td>
-    <td>{$server.username}</td>
-    <td>{$server.nickname}</td>
-    <td>{$server.loginip}</td>
+    <td>{$server.server_name}</td>
+    <td>{$server.public_ip}</td>
+    <td>{$server.private_ip}</td>
+    <td>{$server.remark}</td>
     <td class="{if $server.type === 1}text-success{else /}text-danger{/if}">
         {$type[$server.type]}
     </td>
@@ -109,15 +112,35 @@
                             </div>
                         </div>
                         <div class="col-12">
+                            <!-- radio -->
+                            <div class="form-group clearfix">
+                                <label>类型</label>
+                                <div>
+                                    <div class="icheck-success d-inline">
+                                        <input type="radio" id="radioPrimary1" value="2" name="type" checked>
+                                        <label for="radioPrimary1">节点服务器</label>
+                                    </div>
+                                    <div class="icheck-danger d-inline">
+                                        <input type="radio" id="radioPrimary2" value="1" name="type">
+                                        <label for="radioPrimary2">后端服务器</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
                             <div class="form-group">
                                 <label>外网ip</label>
-                                <input type="text" name="public_ip" autocomplete="off" class="form-control">
+                                <div>
+                                    <input type="text" name="public_ip" autocomplete="off" class="form-control">
+                                </div>
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="form-group">
                                 <label>内网ip</label>
-                                <input type="text" name="private_ip" autocomplete="off" class="form-control">
+                                <div>
+                                    <input type="text" name="private_ip" autocomplete="off" class="form-control">
+                                </div>
                             </div>
                         </div>
                         <div class="col-12">

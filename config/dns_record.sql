@@ -49,7 +49,6 @@ DROP TABLE IF EXISTS `domains`;
 CREATE TABLE `domains`  (
     `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID',
     `domain` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '域名',
-    `site_name` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '站点名称',
     `site_id` int UNSIGNED NOT NULL DEFAULT 0 COMMENT '站点id',
     `zone_identifier` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '域名的域ID',
     `remark` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '备注',
@@ -118,6 +117,7 @@ CREATE TABLE `sites`  (
     `a_record_id` int UNSIGNED NOT NULL DEFAULT 0  COMMENT 'A记录DNS id',
     `base_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '站点本地路径',
     `origin_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '站点远程路径',
+    `backend_domain` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '后台域名',
     `web_domains` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '站点域名列表,空格分割的字符串',
     `remark` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '备注',
     `create_time` int UNSIGNED NULL DEFAULT NULL COMMENT '创建时间',

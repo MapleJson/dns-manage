@@ -23,8 +23,8 @@ class Server extends AdminController
     public function index()
     {
         $where = [];
-        if (!empty(input('get.ip'))) {
-            $where[] = ['ip', 'like', '%' . trim(input('get.ip')) . '%'];
+        if (!empty(input('get.public_ip'))) {
+            $where[] = ['public_ip', 'like', '%' . trim(input('get.public_ip')) . '%'];
         }
         if (!empty(input('get.type'))) {
             $where[] = ['type', '=', intval(input('get.type'))];

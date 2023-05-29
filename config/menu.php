@@ -9,34 +9,26 @@ return [
     [
         'name' => '服务器管理',
         'url' => url('server-index'),
-        'icon' => 'fa-tachometer-alt',
+        'icon' => 'fa-server',
     ],
     [
         'name' => '域名管理',
         'url' => url('domain-index'),
-        'icon' => 'fa-users',
+        'icon' => 'fa-link',
     ],
     [
         'name' => 'DNS管理',
-        'url' => url('dns-index'),
-        'icon' => 'fa-users',
+        'url' => url('record-index'),
+        'icon' => 'fa-dna',
     ],
-
+    [
+        'name' => '站点管理',
+        'url' => url('site-index'),
+        'icon' => 'fa-sitemap',
+    ],
     [
         'name' => '管理员管理',
-        'url' => url(''),
+        'url' => url('admin-index'),
         'icon' => 'fa-users-cog',
-        'children' => [
-            [
-                'name' => '管理员列表',
-                'url' => url('admin-index'),
-                'icon' => '',
-            ],
-//            [
-//                'name' => '操作日志',
-//                'url' => url('admin-log'),
-//                'icon' => '',
-//            ],
-        ]
     ],
 ];

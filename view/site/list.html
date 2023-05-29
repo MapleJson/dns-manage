@@ -1,0 +1,281 @@
+{extend name='common/layout' /}
+
+{block name='title'}站点管理{/block}
+
+{block name='css'}
+<!-- DataTables -->
+<link rel="stylesheet" href="/static/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="/static/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+<!-- Select2 -->
+<link rel="stylesheet" href="/static/plugins/select2/css/select2.min.css">
+<link rel="stylesheet" href="/static/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+<!-- SweetAlert2 -->
+<link rel="stylesheet" href="/static/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
+{/block}
+
+{block name='search'}
+<form action="{:url('site-index')}" method="get">
+    <div class="form-row">
+        <div class="col-md-1 mb-3">
+            <select class="form-control select2" name="server_id">
+                <option value="">后端服务器</option>
+                {volist name='servers' id='server'}
+                <option {if $Request.param.server_id == $server.id}selected{/if}
+                value="{$server.id}">{$server.server_name}</option>
+                {/volist}
+            </select>
+        </div>
+        <div class="col-md-1 mb-3">
+            <select class="form-control select2" name="front_server_id">
+                <option value="">节点服务器</option>
+                {volist name='servers' id='server'}
+                <option {if $Request.param.front_server_id == $server.id}selected{/if}
+                value="{$server.id}">{$server.server_name}</option>
+                {/volist}
+            </select>
+        </div>
+        <div class="col-md-2 mb-3">
+            <select class="form-control select2" name="a_domain_id">
+                <option value="">域名</option>
+                {volist name='domains' id='domain'}
+                <option {if $Request.param.a_domain_id== $domain.id}selected{/if}
+                value="{$domain.id}">{$domain.domain}</option>
+                {/volist}
+            </select>
+        </div>
+        <div class="col-md-1 mb-3">
+            <select class="form-control select2" name="status">
+                <option value="">状态</option>
+                {foreach $siteStatus as $key => $val}
+                <option {if $Request.param.status == $key}selected{/if}
+                value="{$key}">{$val}</option>
+                {/foreach}
+            </select>
+        </div>
+        <div class="col-md-2 mb-3">
+            <input type="text" class="form-control" name="site_name" placeholder="站点名称" value="{$Request.param.site_name}">
+        </div>
+        <div class="col-md-2 mb-3">
+            <input type="text" class="form-control" name="web_domains" placeholder="站点域名" value="{$Request.param.web_domains}">
+        </div>
+        <div class="col-md-1 mb-3">
+            <button class="btn btn-primary" type="submit">搜索</button>
+        </div>
+        <div class="col-md-1 mb-3">
+            <button class="btn btn-success" data-toggle="modal" data-target="#add-site" type="button">新增</button>
+        </div>
+    </div>
+</form>
+{/block}
+
+{block name='thead'}
+<tr class="text-center">
+    <th>编号</th>
+    <th>站点名称</th>
+    <th>自定义域名</th>
+    <th>后端服务器</th>
+    <th>节点服务器</th>
+    <th>A记录域名</th>
+    <th>A记录DNS名</th>
+    <th>站点状态</th>
+    <th>创建时间</th>
+    <th>操作</th>
+</tr>
+{/block}
+
+{block name='tbody'}
+{volist name='list' id='site'}
+<tr class="text-center">
+    <td>{$site.id}</td>
+    <td>{$site.site_name}</td>
+    <td>{$site.private_domain}</td>
+    <td>{$site.server}</td>
+    <td>{$site.frontServer}</td>
+    <td>{$site.aDomain}</td>
+    <td>{$site.aDns}</td>
+    <td class="{if $site.status === 1}text-blue{elseif $site.status === 2}text-dark{elseif $site.status === 3}text-success{else/}text-danger{/if}">
+        {$siteStatus[$site.status]}
+    </td>
+    <td>{$site.create_time}</td>
+    <td class="text-center">
+        <a class="btn btn-success btn-sm" href="{:url('site-deploy', ['id' => $site.id])}">部署</a>
+        <a class="btn btn-success btn-sm" href="{:url('site-update', ['id' => $site.id])}">编辑</a>
+        <a class="btn btn-danger btn-sm" href="{:url('site-delete', ['id' => $site.id])}">删除</a>
+    </td>
+</tr>
+{/volist}
+{/block}
+
+{block name='page'}
+<div class="row mt-4">
+    <div class="col-sm-12 col-md-5">
+        <div class="dataTables_info" id="DataTables_Table_0_info" role="status" aria-live="polite">
+            每页展示20条数据，共{$list->total()}条数据
+        </div>
+    </div>
+    <div class="col-sm-12 col-md-7">
+        <div class="dataTables_paginate paging_simple_numbers">
+            {$list|raw}
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name='dialog'}
+<!-- Add Details Modal -->
+<div class="modal fade" id="add-site" aria-hidden="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">添加站点</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{:url('site-create')}" method="POST" id="add-data-form" role="form">
+                    {:token_field()}
+                    <div class="row form-row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label>站点名称</label>
+                                <div>
+                                    <input type="text" name="site_name" autocomplete="off" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label>后端服务器</label>
+                                <select class="form-control select2" name="server_id">
+                                    <option value="0">请选择服务器</option>
+                                    {volist name='servers' id='server'}
+                                    <option {if $Request.param.server_id == $server.id}selected{/if}
+                                    value="{$server.id}">{$server.server_name}</option>
+                                    {/volist}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label>节点服务器</label>
+                                <select class="form-control select2" name="front_server_id">
+                                    <option value="0">请选择服务器</option>
+                                    {volist name='frontServers' id='frontServer'}
+                                    <option {if $Request.param.front_server_id == $frontServer.id}selected{/if}
+                                    value="{$frontServer.id}">{$frontServer.server_name}</option>
+                                    {/volist}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label>A记录域名</label>
+                                <select class="form-control select2" name="domain_id">
+                                    <option value="0">请选择域名</option>
+                                    {volist name='domains' id='domain'}
+                                    <option {if $Request.param.domain_id == $domain.id}selected{/if}
+                                    value="{$domain.id}">{$domain.domain}</option>
+                                    {/volist}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label>自定义域名</label>
+                                <div>
+                                    <input type="text" name="private_domain" autocomplete="off" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label>项目本地路径</label>
+                                <div>
+                                    <input type="text" name="base_path" autocomplete="off" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label>项目远程路径</label>
+                                <div>
+                                    <input type="text" name="origin_path" autocomplete="off" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label>后台域名</label>
+                                <div>
+                                    <input type="text" name="backend_domain" autocomplete="off" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label>站点域名(以空格分隔)</label>
+                                <div>
+                                    <textarea name="web_domains" placeholder="以空格分隔,如：aaa.com bbb.com" autocomplete="off" class="form-control"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label>备注</label>
+                                <div>
+                                    <textarea name="remark" autocomplete="off" class="form-control"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label>站点状态</label>
+                                <select class="form-control select2" name="status">
+                                    <option value="0">请选择状态</option>
+                                    {foreach $siteStatus as $key => $val}
+                                    <option {if $Request.param.status == $key}selected{/if}
+                                    value="{$key}">{$val}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="submit" class="btn btn-primary">确认</button>
+                        <button type="reset" class="btn btn-danger">重置</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Add Details Modal -->
+{/block}
+
+{block name='script'}
+<!-- DataTables -->
+<script src="/static/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="/static/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="/static/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+<script src="/static/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+<!-- jquery-validation -->
+<script src="/static/plugins/jquery-validation/jquery.validate.min.js"></script>
+<script src="/static/plugins/jquery-validation/additional-methods.min.js"></script>
+<!-- Select2 -->
+<script src="/static/plugins/select2/js/select2.full.min.js"></script>
+<!-- SweetAlert2 -->
+<script src="/static/plugins/sweetalert2/sweetalert2.min.js"></script>
+<!-- validate rule -->
+<script src="/static/js/validate.js"></script>
+<script>
+    $(function () {
+        // validate start
+        // validateOption.rules = addsiteFormRule;
+        // validateOption.messages = addsiteFormMsg;
+        // $('#add-data-form').validate(validateOption);
+        // validate end
+    });
+</script>
+{/block}
