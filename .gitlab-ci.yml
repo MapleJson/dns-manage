@@ -1,0 +1,41 @@
+# 阶段
+stages:
+  - build
+  - deploy
+
+# 测试任务
+build-job(main):
+  # 阶段名称
+  stage: build
+  # 仅针对main触发
+  only:
+    - main
+  # 仅针对tag为dev的runner触发
+  tags:
+    - deploy
+  # 缓存目录
+  artifacts:
+    paths:
+      - ./
+  # 任务脚本
+  script:
+    # 检查编译后的文件是否存在
+    - composer install
+
+# 部署任务
+deploy-job(main):
+  # 阶段名称
+  stage: deploy
+  # 仅针对main触发
+  only:
+    - main
+  # 仅针对tag为dev的runner触发
+  tags:
+    - deploy
+  # 依赖缓存任务
+  dependencies:
+    - build-job(main)
+  # 任务脚本
+  script:
+    # 检查编译后的文件是否存在
+    - /usr/bin/rsync -vzrtopg --omit-dir-times --delete --exclude ".git" --exclude ".env" --exclude "public/uploads"  --exclude "runtime" ./ /opt/www/dnsManage/
