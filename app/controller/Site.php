@@ -114,6 +114,9 @@ server {
 }
 EOF;
         // 写Nginx配置文件
+        if (!is_dir(runtime_path("nginx/{$random}"))) {
+            mkdir(runtime_path("nginx/{$random}"));
+        }
         $backendConfPath = runtime_path("nginx/{$random}") . 'backend.conf';
         $frontendConfPath = runtime_path("nginx/{$random}") . 'frontend.conf';
         file_put_contents($backendConfPath, $backendConf);
