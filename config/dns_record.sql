@@ -108,21 +108,23 @@ CREATE TABLE `servers`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `sites`;
 CREATE TABLE `sites`  (
-    `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT '主键ID',
     `site_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '站点名称',
-    `private_domain` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '站点自定义域名,供host解析用',
-    `server_id` int UNSIGNED NOT NULL COMMENT '后端服务器id',
-    `front_server_id` int UNSIGNED NOT NULL COMMENT '节点服务器id',
-    `a_domain_id` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'A记录域名id',
-    `back_a_record_id` int UNSIGNED NOT NULL DEFAULT 0  COMMENT '后台A记录DNS id',
+    `private_domain` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '站点自定义域名,供host解析用',
+    `server_id` int unsigned NOT NULL COMMENT '后端服务器id',
+    `front_server_id` int unsigned NOT NULL COMMENT '节点服务器id',
+    `a_domain_id` int unsigned NOT NULL DEFAULT '0' COMMENT 'A记录域名id',
+    `back_a_record_id` int unsigned NOT NULL DEFAULT '0' COMMENT '后台A记录DNS id',
     `front_a_record_id` int unsigned NOT NULL DEFAULT '0' COMMENT '前台A记录DNS id',
     `base_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '站点本地路径',
     `origin_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '站点远程路径',
     `backend_domain` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '后台域名',
-    `web_domains` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '站点域名列表,空格分割的字符串',
-    `remark` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '备注',
-    `create_time` int UNSIGNED NULL DEFAULT NULL COMMENT '创建时间',
-    `update_time` int UNSIGNED NULL DEFAULT NULL COMMENT '更新时间',
+    `web_domains` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '站点域名列表,空格分割的字符串',
+    `status` tinyint unsigned NOT NULL COMMENT '状态 1开发中 2测试中 3已上线 4已下线',
+    `deployed` tinyint unsigned DEFAULT '0' COMMENT '是否部署过 1部署过 0 没部署',
+    `remark` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '备注',
+    `create_time` int unsigned DEFAULT NULL COMMENT '创建时间',
+    `update_time` int unsigned DEFAULT NULL COMMENT '更新时间',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '服务器表';
 

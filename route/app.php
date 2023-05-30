@@ -35,6 +35,7 @@ Route::group(function () {
     Route::post('site/create', 'site/save')->name('site-create');
     Route::post('site/update', 'site/update')->name('site-update');
     Route::get('site/deploy', 'site/deploy')->name('site-deploy');
+    Route::post('site/change/domain', 'site/changeWebDomains')->name('site-change-domain');
     Route::get('site/delete', 'site/delete')->name('site-delete');
 
     // 管理员管理

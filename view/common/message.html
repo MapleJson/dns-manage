@@ -4,7 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
     <title>提示</title>
-<!--    &lt;!&ndash; Theme style &ndash;&gt;-->
+    <!-- Fontawesome CSS -->
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <!-- Feathericon CSS -->
+    <link rel="stylesheet" href="/static/css/feathericon.min.css">
+    <!--    &lt;!&ndash; Theme style &ndash;&gt;-->
     <link rel="stylesheet" href="/static/css/adminlte.min.css">
     <!-- Main CSS -->
     <link rel="stylesheet" href="/static/css/style.css">
@@ -15,12 +19,14 @@
 <div class="main-wrapper">
 
     <div class="error-box">
-        {if $wait === 1}
-        <h3 class="h2 mb-3 text-success"><i class="fa fa-check-square"></i>{$message}</h3>
+        {if $wait === 3}
+        <h3 class="h2 mb-3 text-success" style="word-wrap:break-word;"><i class="fas fa-check-square"></i>{$message}</h3>
         {else /}
-        <h3 class="h2 mb-3 text-danger"><i class="fa fa-warning"></i>{$message}</h3>
+        <h3 class="h2 mb-3 text-danger" style="word-wrap:break-word;"><i class="fa fa-warning"></i>{$message}</h3>
         {/if}
         <p class="h4 font-weight-normal">当前页面还有<span id="wait">{$wait}</span>秒跳转至上一个页面</p>
+        <a href="{$url}" class="btn btn-primary">返回上一页</a>
+        <p></p>
         <a href="{:url('home')}" class="btn btn-primary">返回主页</a>
     </div>
 

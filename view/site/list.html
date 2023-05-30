@@ -101,6 +101,7 @@
     <td>{$site.create_time}</td>
     <td class="text-center">
         <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#show-site" onclick="showUrl({$site})" type="button">查看域名</button>
+        <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#change-site-domain" onclick="changeWebDomain({$site})" type="button">修改域名</button>
         <a class="btn btn-warning btn-sm" href="{:url('site-deploy', ['id' => $site.id])}">部署</a>
         <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#add-site" onclick="showUpdate({$site})" type="button">编辑</button>
         <a class="btn btn-danger btn-sm" href="{:url('site-delete', ['id' => $site.id])}">删除</a>
@@ -222,14 +223,6 @@
                         </div>
                         <div class="col-12">
                             <div class="form-group">
-                                <label>站点域名(以空格分隔)</label>
-                                <div>
-                                    <textarea name="web_domains" placeholder="以空格分隔,如：aaa.com bbb.com" autocomplete="off" class="form-control"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="form-group">
                                 <label>备注</label>
                                 <div>
                                     <textarea name="remark" autocomplete="off" class="form-control"></textarea>
@@ -248,6 +241,41 @@
     </div>
 </div>
 <!-- /Add Details Modal -->
+<!-- Edit Details Modal -->
+<div class="modal fade" id="change-site-domain" aria-hidden="true" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">编辑站点域名</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{:url('site-change-domain')}" method="POST" id="change-domain-form" role="form">
+                    {:token_field()}
+                    <input type="hidden" value="0" name="id" />
+                    <div class="row form-row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label>站点域名(以空格分隔)</label>
+                                <div>
+                                    <textarea name="web_domains" rows="6" placeholder="以空格分隔,如：aaa.com bbb.com" autocomplete="off" class="form-control"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="submit" class="btn btn-primary">确认</button>
+                        <button type="reset" class="btn btn-danger">重置</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Edit Details Modal -->
 <!-- Show Details Modal -->
 <div class="modal fade" id="show-site" aria-hidden="true" role="dialog">
     <div class="modal-dialog">
@@ -313,13 +341,16 @@
         $('#add-data-form input[name=base_path]').val(data.base_path)
         $('#add-data-form input[name=origin_path]').val(data.origin_path)
         $('#add-data-form input[name=backend_domain]').val(data.backend_domain)
-        $('#add-data-form input[name=web_domains]').val(data.web_domains)
         $('#add-data-form textarea[name=remark]').val(data.remark)
         $('#add-data-form select[name=server_id] option[value=' + data.server_id +']').attr('selected', true)
         $('#add-data-form select[name=front_server_id] option[value=' + data.front_server_id +']').attr('selected', true)
         $('#add-data-form select[name=a_domain_id] option[value=' + data.a_domain_id +']').attr('selected', true)
         $('#add-data-form select[name=status] option[value=' + data.status +']').attr('selected', true)
         $('#add-data-form select').select2()
+    }
+    function changeWebDomain(data) {
+        $('#change-domain-form input[name=id]').val(data.id)
+        $('#change-domain-form textarea[name=web_domains]').val(data.web_domains)
     }
 </script>
 {/block}

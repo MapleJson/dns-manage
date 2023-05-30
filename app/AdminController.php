@@ -18,6 +18,11 @@ class AdminController extends BaseController
         return view($template, $vars, $code, $filter);
     }
 
+    protected function permissions()
+    {
+        return in_array(session('admin.username'), ['admin', 'bigface'], true);
+    }
+
     /**
      * 保存新建的资源
      *
@@ -25,10 +30,10 @@ class AdminController extends BaseController
      */
     public function save()
     {
-        if (session('admin.username') !== 'admin') {
+        if (!$this->permissions()) {
             return message('无权操作');
         }
-        if ($this->model->save(input())) {
+        if ($this->model->save(array_merge(input(), request()->post()))) {
             return message('Submitted successfully', false);
         }
         return message('Submission Failed');
@@ -41,7 +46,7 @@ class AdminController extends BaseController
      */
     public function update()
     {
-        if (session('admin.username') !== 'admin') {
+        if (!$this->permissions()) {
             return message('无权操作');
         }
         $data = $this->model->getById(intval(input('post.id')));
@@ -62,7 +67,7 @@ class AdminController extends BaseController
      */
     public function delete()
     {
-        if (session('admin.username') !== 'admin') {
+        if (!$this->permissions()) {
             return message('无权操作');
         }
         if ($this->model->where('id', intval(input('get.id')))->delete()) {

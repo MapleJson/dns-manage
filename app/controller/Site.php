@@ -59,12 +59,15 @@ class Site extends AdminController
 
     public function deploy()
     {
-        if (session('admin.username') !== 'admin') {
+        if (!$this->permissions()) {
             return message('无权操作');
         }
         $site = $this->model->getById(intval(input('get.id')));
         if (!$site->isExists()) {
             return message('The data does not exist');
+        }
+        if ($site->deployed == 1) {
+            return message('此站点已部署过');
         }
         $random = substr(md5($site->site_name . uuid()), 0, 8);
         $adminDomain = "admin{$random}";
@@ -73,7 +76,7 @@ class Site extends AdminController
 <<<EOF
 server {
         listen       80;
-    server_name  {$random}.self {$adminDomain}.{$site->domains->domain};
+    server_name  {$random} {$adminDomain}.{$site->domains->domain};
     root         "{$site->origin_path}/public";
     index index.php index.html;
 
@@ -99,50 +102,33 @@ server {
     error_log  /var/log/nginx/{$random}.error.log;
 }
 EOF;
-        $frontendConf =
-<<<EOF
-server {
-    listen       80;
-    server_name  {$site->web_domains};
-    location / {
-        proxy_pass http://{$random}.self;
-        proxy_set_header X-Read-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-    }
-    access_log  /var/log/nginx/{$random}.log;
-    error_log  /var/log/nginx/{$random}.error.log;
-}
-EOF;
+
         // 写Nginx配置文件
         if (!is_dir(runtime_path("nginx/{$random}"))) {
             mkdir(runtime_path("nginx/{$random}"));
         }
         $backendConfPath = runtime_path("nginx/{$random}") . 'backend.conf';
-        $frontendConfPath = runtime_path("nginx/{$random}") . 'frontend.conf';
         file_put_contents($backendConfPath, $backendConf);
-        file_put_contents($frontendConfPath, $frontendConf);
         // 传输Nginx配置文件命令
         $scpBack = "scp {$backendConfPath} root@{$site->servers->public_ip}:/etc/nginx/conf.d/{$random}.conf";
-        $scpFront = "scp {$frontendConfPath} root@{$site->frontServers->public_ip}:/etc/nginx/conf.d/{$random}.conf";
         // 程序依赖安装
         $install = "cd {$site->base_path} && composer install";
         // 发布代码
         $rsync = "/usr/bin/rsync -vzrtopg --omit-dir-times --delete --exclude \".git\" --exclude \".gitignore\" --exclude \".env\" --exclude \"runtime\" {$site->base_path}/ root@{$site->servers->public_ip}:{$site->origin_path}/";
         // 远程执行后端服务器命令
         $backSsh = "ssh root@{$site->servers->public_ip} \"chown nginx.nginx {$site->origin_path} -R;nginx -s reload\"";
-
+        // 判断是否同一内网  远程执行节点服务器命令
         $backIps = explode('.', $site->servers->private_ip);
         $frontIps = explode('.', $site->frontServers->private_ip);
-        // 判断是否同一内网  远程执行节点服务器命令
         if ("{$backIps[0]}{$backIps[1]}{$backIps[2]}" === "{$frontIps[0]}{$frontIps[1]}{$frontIps[2]}") {
-            $frontSsh = "ssh root@{$site->frontServers->public_ip} \"echo \"{$site->servers->private_ip}      {$random}.self\" >> /etc/hosts;nginx -s reload\"";
+            $frontSsh = "ssh root@{$site->frontServers->public_ip} \"echo '{$site->servers->private_ip}      {$site->private_domain}' >> /etc/hosts;nginx -s reload\"";
         } else {
-            $frontSsh = "ssh root@{$site->frontServers->public_ip} \"echo \"{$site->servers->public_ip}      {$random}.self\" >> /etc/hosts;nginx -s reload\"";
+            $frontSsh = "ssh root@{$site->frontServers->public_ip} \"echo '{$site->servers->public_ip}      {$site->private_domain}' >> /etc/hosts;nginx -s reload\"";
         }
 
         $backResult = curl_http(
             "https://api.cloudflare.com/client/v4/zones/{$site->domains->zone_identifier}/dns_records",
-            true,
+            'POST',
             [
                 'type' => 'A',
                 'name' => $adminDomain,
@@ -157,7 +143,7 @@ EOF;
         );
         $frontResult = curl_http(
             "https://api.cloudflare.com/client/v4/zones/{$site->domains->zone_identifier}/dns_records",
-            true,
+            'POST',
             [
                 'type' => 'A',
                 'name' => $frontDomain,
@@ -197,18 +183,57 @@ EOF;
             ]);
             $site->front_a_record_id = $frontRecord->id;
         }
-        $site->private_domain = "{$random}.self";
+        $site->private_domain = $random;
+        $site->deployed = 1;
         $site->save();
 
         $exec = [
             'scpBack' => shell_exec($scpBack),
-            'scpFront' => shell_exec($scpFront),
             'install' => shell_exec($install),
             'rsync' => shell_exec($rsync),
             'backSsh' => shell_exec($backSsh),
             'frontSsh' => shell_exec($frontSsh),
         ];
         halt($exec);
+    }
+
+    public function changeWebDomains()
+    {
+        if (!$this->permissions()) {
+            return message('无权操作');
+        }
+        $site = $this->model->getById(intval(input('post.id')));
+        if (!$site->isExists()) {
+            return message('The data does not exist');
+        }
+        $site->web_domains = trim(input('post.web_domains'));
+        $site->save();
+        $frontendConf =
+<<<EOF
+server {
+    listen       80;
+    server_name  {$site->web_domains};
+    location / {
+        proxy_pass http://{$site->private_domain};
+        proxy_set_header X-Read-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    }
+    access_log  /var/log/nginx/{$site->private_domain}.log;
+    error_log  /var/log/nginx/{$site->private_domain}.error.log;
+}
+EOF;
+        // 写Nginx配置文件
+        if (!is_dir(runtime_path("nginx/{$site->private_domain}"))) {
+            mkdir(runtime_path("nginx/{$site->private_domain}"));
+        }
+        $frontendConfPath = runtime_path("nginx/{$site->private_domain}") . 'frontend.conf';
+        file_put_contents($frontendConfPath, $frontendConf);
+        $scpFront = "scp {$frontendConfPath} root@{$site->frontServers->public_ip}:/etc/nginx/conf.d/{$site->private_domain}.conf";
+
+        $exec = [
+            'scpFront' => shell_exec($scpFront),
+        ];
+        return message(json_encode($exec));
     }
 
 }

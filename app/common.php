@@ -74,19 +74,22 @@ if (!function_exists('curl_http')) {
      * CURL GET || post请求
      * @desc: GET与post都通用
      * @param: $url 请求的地址
-     *       $isPostRequest 默认true是GET请求，否则是POST请求
+     *       $request 默认是GET请求，否则是POST请求
      *       $data array  请求的参数
      *       $certParam  array  ['cert_path']    ['key_path']
      * @return:
      */
-    function curl_http($url, $isPostRequest = false, $data = [], $header = [], $certParam = [])
+    function curl_http($url, $request = 'GET', $data = [], $header = [], $certParam = [])
     { // 模拟提交数据函数
         $curlObj = curl_init(); // 启动一个CURL会话
         //如果是POST请求
-        if ($isPostRequest) {
+        if (strtoupper($request) === 'POST') {
             curl_setopt($curlObj, CURLOPT_POST, 1); // 发送一个常规的Post请求
-            curl_setopt($curlObj, CURLOPT_POSTFIELDS, json_encode($data)); // Post提交的数据包
-        } else {  //get请求检查是否拼接了参数，如果没有，检查$data是否有参数，有参数就进行拼接操作
+            if (!empty($data)) {
+                curl_setopt($curlObj, CURLOPT_POSTFIELDS, json_encode($data)); // Post提交的数据包
+            }
+        }
+        if (strtoupper($request) === 'GET') {  //get请求检查是否拼接了参数，如果没有，检查$data是否有参数，有参数就进行拼接操作
             $getParamStr = '';
             if (!empty($data) && is_array($data)) {
                 $tmpArr = [];
@@ -97,6 +100,18 @@ if (!function_exists('curl_http')) {
             }
             //检查链接中是否有参数
             $url .= strpos($url, '?') !== false ? '&' . $getParamStr : '?' . $getParamStr;
+        }
+        if (strtoupper($request) === 'DELETE') {
+            curl_setopt($curlObj, CURLOPT_CUSTOMREQUEST, 'DELETE'); // 发送一个delete请求
+            if (!empty($data)) {
+                curl_setopt($curlObj, CURLOPT_POSTFIELDS, json_encode($data)); // 提交的数据包
+            }
+        }
+        if (strtoupper($request) === 'PUT') {
+            curl_setopt($curlObj, CURLOPT_CUSTOMREQUEST, 'PUT'); // 发送一个PUT请求
+            if (!empty($data)) {
+                curl_setopt($curlObj, CURLOPT_POSTFIELDS, json_encode($data)); // 提交的数据包
+            }
         }
         curl_setopt($curlObj, CURLOPT_URL, $url); // 要访问的地址
         //检查链接是否https请求

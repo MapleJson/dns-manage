@@ -42,11 +42,65 @@ class Record extends AdminController
 
     public function save()
     {
-        if (session('admin.username') !== 'admin') {
+        if (!$this->permissions()) {
             return message('无权操作');
         }
+        $site = Sites::getById(intval(input('post.site_id')));
+        $domain = Domains::getById(intval(input('post.domain_id')));
+        $result = curl_http(
+            "https://api.cloudflare.com/client/v4/zones/{$domain->zone_identifier}/dns_records",
+            'POST',
+            [
+                'type' => 'A',
+                'name' => input('post.name'),
+                'content' => input('post.content'),
+                'comment' => empty(input('post.comment')) ? $site->site_name : input('post.comment'),
+                'proxied' => true,
+            ],
+            [
+                'Authorization: Bearer ' . env('cf.auth_key'),
+                'Content-Type: application/json'
+            ]
+        );
+        $record = json_decode($result, true);
+        if ($record['success']) {
+            request()->withPost(['identifier' => $record['result']['id']]);
+            return parent::save();
+        }
+        return message('Submission Failed');
+    }
 
-        return parent::save();
+    /**
+     * 删除选中的资源
+     * @return mixed
+     */
+    public function delete()
+    {
+        if (!$this->permissions()) {
+            return message('无权操作');
+        }
+        $record = Records::getById(intval(input('get.id')));
+        if (empty($record->domains->zone_identifier) || empty($record->identifier)) {
+            return parent::delete();
+        }
+        $result = curl_http(
+            "https://api.cloudflare.com/client/v4/zones/{$record->domains->zone_identifier}/dns_records/{$record->identifier}",
+            'DELETE',
+            [],
+            [
+                'Authorization: Bearer ' . env('cf.auth_key'),
+                'Content-Type: application/json'
+            ]
+        );
+        $delete = json_decode($result, true);
+
+        if ($delete['success']) {
+            return parent::delete();
+        }
+        if ($delete['errors'][0]['code'] == 81044) {
+            return parent::delete();
+        }
+        return message('Delete failed');
     }
 
 }
