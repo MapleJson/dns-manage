@@ -121,9 +121,9 @@ EOF;
         $backIps = explode('.', $site->servers->private_ip);
         $frontIps = explode('.', $site->frontServers->private_ip);
         if ("{$backIps[0]}{$backIps[1]}{$backIps[2]}" === "{$frontIps[0]}{$frontIps[1]}{$frontIps[2]}") {
-            $frontSsh = "ssh root@{$site->frontServers->public_ip} \"echo '{$site->servers->private_ip}      {$site->private_domain}' >> /etc/hosts;nginx -s reload\"";
+            $frontSsh = "ssh root@{$site->frontServers->public_ip} \"echo '{$site->servers->private_ip}      {$random}' >> /etc/hosts;nginx -s reload\"";
         } else {
-            $frontSsh = "ssh root@{$site->frontServers->public_ip} \"echo '{$site->servers->public_ip}      {$site->private_domain}' >> /etc/hosts;nginx -s reload\"";
+            $frontSsh = "ssh root@{$site->frontServers->public_ip} \"echo '{$site->servers->public_ip}      {$random}' >> /etc/hosts;nginx -s reload\"";
         }
 
         $backResult = curl_http(
