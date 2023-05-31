@@ -39,6 +39,9 @@ class Domain extends AdminController
 
     public function save()
     {
+        if (!$this->permissions()) {
+            return message('无权操作');
+        }
         $result = curl_http(
             "https://api.cloudflare.com/client/v4/zones",
             'POST',
@@ -60,6 +63,39 @@ class Domain extends AdminController
             return parent::save();
         }
         return message('Submission Failed');
+    }
+
+    /**
+     * 删除选中的资源
+     * @return mixed
+     */
+    public function delete()
+    {
+        if (!$this->permissions()) {
+            return message('无权操作');
+        }
+        $domain = Domains::getById(intval(input('get.id')));
+        if (empty($domain->zone_identifier)) {
+            return parent::delete();
+        }
+        $result = curl_http(
+            "https://api.cloudflare.com/client/v4/zones/{$domain->zone_identifier}",
+            'DELETE',
+            [],
+            [
+                'Authorization: Bearer ' . env('cf.auth_key'),
+                'Content-Type: application/json'
+            ]
+        );
+        $delete = json_decode($result, true);
+
+        if ($delete['success']) {
+            return parent::delete();
+        }
+        if ($delete['errors'][0]['code'] == 1001) {
+            return parent::delete();
+        }
+        return message('Delete failed');
     }
 
 }
