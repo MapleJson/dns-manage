@@ -49,7 +49,7 @@ class Site extends AdminController
             $item->aDomain = empty($item->domains) ? '' : $item->domains->domain;
             $item->aBackDns = empty($item->backRecords) ? '' : $item->backRecords->name;
             $item->aFrontDns = empty($item->frontRecords) ? '' : $item->frontRecords->name;
-            $item->webDomains = explode(' ', $item->web_domains);
+            $item->webDomains = empty($item->web_domains) ? [] : explode(' ', $item->web_domains);
         }
         $domains = Domains::field('id, domain')->select()->column(null, 'id');
         $servers = Servers::field('id, server_name')->where('type', 1)->select()->column(null, 'id');
@@ -69,7 +69,7 @@ class Site extends AdminController
         if ($site->deployed == 1) {
             return message('此站点已部署过');
         }
-        $random = substr(md5($site->site_name . uuid()), 0, 8);
+        $random = substr(md5($site->site_name . uuid()), 0, 10);
         $adminDomain = "admin{$random}";
         $frontDomain = "front{$random}";
         $backendConf =
