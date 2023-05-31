@@ -71,6 +71,7 @@
 {block name='thead'}
 <tr class="text-center">
     <th>编号</th>
+    <th>站点区域</th>
     <th>站点名称</th>
     <th>自定义域名</th>
     <th>后端服务器</th>
@@ -88,6 +89,7 @@
 {volist name='list' id='site'}
 <tr class="text-center">
     <td>{$site.id}</td>
+    <td>{$areas[$site.area]}</td>
     <td>{$site.site_name}</td>
     <td>{$site.private_domain}</td>
     <td>{$site.server}</td>
@@ -165,7 +167,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-6">
+                        <div class="col-12">
                             <div class="form-group">
                                 <label>A记录域名</label>
                                 <select class="form-control select2" name="a_domain_id">
@@ -184,6 +186,18 @@
                                     <option value="0">请选择状态</option>
                                     {foreach $siteStatus as $key => $val}
                                     <option {if $Request.param.status == $key}selected{/if}
+                                    value="{$key}">{$val}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>站点地区</label>
+                                <select class="form-control select2" name="status">
+                                    <option value="0">请选择地区</option>
+                                    {foreach $areas as $key => $val}
+                                    <option {if $Request.param.area == $key}selected{/if}
                                     value="{$key}">{$val}</option>
                                     {/foreach}
                                 </select>
@@ -346,6 +360,7 @@
         $('#add-data-form select[name=front_server_id] option[value=' + data.front_server_id +']').attr('selected', true)
         $('#add-data-form select[name=a_domain_id] option[value=' + data.a_domain_id +']').attr('selected', true)
         $('#add-data-form select[name=status] option[value=' + data.status +']').attr('selected', true)
+        $('#add-data-form select[name=area] option[value=' + data.area +']').attr('selected', true)
         $('#add-data-form select').select2()
     }
     function changeWebDomain(data) {

@@ -43,6 +43,7 @@ class Site extends AdminController
         }
         $list = Sites::getPageList($where);
         $siteStatus = lang('siteStatus');
+        $areas = lang('area');
         foreach ($list as &$item) {
             $item->server = empty($item->servers) ? '' : $item->servers->server_name;
             $item->frontServer = empty($item->frontServers) ? '' : $item->frontServers->server_name;
@@ -54,7 +55,7 @@ class Site extends AdminController
         $domains = Domains::field('id, domain')->select()->column(null, 'id');
         $servers = Servers::field('id, server_name')->where('type', 1)->select()->column(null, 'id');
         $frontServers = Servers::field('id, server_name')->where('type', 2)->select()->column(null, 'id');
-        return $this->view('list', compact('list', 'siteStatus', 'domains', 'servers', 'frontServers'));
+        return $this->view('list', compact('list', 'siteStatus', 'domains', 'servers', 'frontServers', 'areas'));
     }
 
     public function deploy()
@@ -194,7 +195,7 @@ EOF;
             'backSsh' => shell_exec($backSsh),
             'frontSsh' => shell_exec($frontSsh),
         ];
-        halt($exec);
+        return message(json_encode($exec));
     }
 
     public function changeWebDomains()

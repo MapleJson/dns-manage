@@ -37,4 +37,29 @@ class Domain extends AdminController
         return $this->view('list', compact('list', 'sites'));
     }
 
+    public function save()
+    {
+        $result = curl_http(
+            "https://api.cloudflare.com/client/v4/zones",
+            'POST',
+            [
+                'type' => 'full',
+                'name' => input('post.domain'),
+                'account' => [
+                    'id' => env('cf.account_id')
+                ]
+            ],
+            [
+                'Authorization: Bearer ' . env('cf.auth_key'),
+                'Content-Type: application/json'
+            ]
+        );
+        $domain = json_decode($result, true);
+        if ($domain['success']) {
+            request()->withPost(['zone_identifier' => $domain['result']['id']]);
+            return parent::save();
+        }
+        return message('Submission Failed');
+    }
+
 }
