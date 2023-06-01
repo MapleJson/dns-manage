@@ -146,7 +146,7 @@
                         <div class="col-12">
                             <div class="form-group">
                                 <label>后端服务器</label>
-                                <select class="form-control select2" name="server_id" multiple>
+                                <select class="form-control select2" name="server_id" >
                                     <option value="0">请选择服务器</option>
                                     {volist name='servers' id='server'}
                                     <option {if $Request.param.server_id == $server.id}selected{/if}
@@ -158,7 +158,7 @@
                         <div class="col-12">
                             <div class="form-group">
                                 <label>节点服务器</label>
-                                <select class="form-control select2" name="front_server_id" multiple>
+                                <select class="form-control select2" name="front_server_id" >
                                     <option value="0">请选择服务器</option>
                                     {volist name='frontServers' id='frontServer'}
                                     <option {if $Request.param.front_server_id == $frontServer.id}selected{/if}
