@@ -143,10 +143,10 @@
                     {:token_field()}
                     <input type="hidden" value="0" name="id" />
                     <div class="row form-row">
-                        <div class="col-6">
+                        <div class="col-12">
                             <div class="form-group">
                                 <label>后端服务器</label>
-                                <select class="form-control select2" name="server_id">
+                                <select class="form-control select2" name="server_id" multiple>
                                     <option value="0">请选择服务器</option>
                                     {volist name='servers' id='server'}
                                     <option {if $Request.param.server_id == $server.id}selected{/if}
@@ -155,10 +155,10 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-6">
+                        <div class="col-12">
                             <div class="form-group">
                                 <label>节点服务器</label>
-                                <select class="form-control select2" name="front_server_id">
+                                <select class="form-control select2" name="front_server_id" multiple>
                                     <option value="0">请选择服务器</option>
                                     {volist name='frontServers' id='frontServer'}
                                     <option {if $Request.param.front_server_id == $frontServer.id}selected{/if}
@@ -194,7 +194,7 @@
                         <div class="col-6">
                             <div class="form-group">
                                 <label>站点地区</label>
-                                <select class="form-control select2" name="status">
+                                <select class="form-control select2" name="area">
                                     <option value="0">请选择地区</option>
                                     {foreach $areas as $key => $val}
                                     <option {if $Request.param.area == $key}selected{/if}
