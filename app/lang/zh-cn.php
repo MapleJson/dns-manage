@@ -67,7 +67,7 @@ server {
     listen       80;
     server_name  {:domains};
     location / {
-        proxy_pass http://balanced{:siteId};
+        proxy_pass http://balanced{:flag};
         proxy_set_header X-Read-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         client_max_body_size       8m;		#允许客户端请求的最大单文件字节数

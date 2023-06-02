@@ -155,6 +155,6 @@ class Deploy extends AdminController
             ];
         }
         (new Shell())->saveAll($shell);
-        return message('Deploy successfully');
+        return message('Deploy successfully', false);
     }
 }

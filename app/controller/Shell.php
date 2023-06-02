@@ -40,7 +40,7 @@ class Shell extends AdminController
         $shell->status = 2;
         $shell->save();
         $exec = shell_exec($shell->shell);
-        return message($exec ?: 'Exec successfully');
+        return message($exec ?: 'Exec successfully', false);
     }
 
 }
