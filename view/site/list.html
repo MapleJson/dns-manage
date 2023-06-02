@@ -56,6 +56,7 @@
     <th>站点区域</th>
     <th>站点名称</th>
     <th>站点标识</th>
+    <th>站点端口</th>
     <th>A记录域名</th>
     <th>后台域名</th>
     <th>站点状态</th>
@@ -71,6 +72,7 @@
     <td>{$areas[$site.area]}</td>
     <td>{$site.site_name}</td>
     <td>{$site.flag}</td>
+    <td>{$site.port}</td>
     <td>{$site.aDomain}</td>
     <td>{$site.backend_domain}</td>
     <td class="{if $site.status === 1}text-blue{elseif $site.status === 2}text-info{elseif $site.status === 3}text-success{else/}text-danger{/if}">
@@ -171,6 +173,14 @@
                             </div>
                         </div>
                         <div class="col-6">
+                            <div class="form-group">
+                                <label>站点端口</label>
+                                <div>
+                                    <input type="number" name="port" placeholder="不可重複" autocomplete="off" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
                             <div class="form-group">
                                 <label>后台域名</label>
                                 <div>
@@ -276,7 +286,9 @@
         $('#add-data-form input[name=id]').val(data.id)
         $('#add-data-form input[name=site_name]').val(data.site_name)
         $('#add-data-form input[name=flag]').val(data.flag)
+        $('#add-data-form input[name=port]').val(data.port)
         $('#add-data-form input[name=flag]').attr('disabled', true)
+        $('#add-data-form input[name=port]').attr('disabled', true)
         $('#add-data-form input[name=backend_domain]').val(data.backend_domain)
         $('#add-data-form input[name=base_path]').val(data.base_path)
         $('#add-data-form input[name=origin_path]').val(data.origin_path)

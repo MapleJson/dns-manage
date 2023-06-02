@@ -51,7 +51,7 @@ class Deploy extends AdminController
         $frontendConfPath = runtime_path("nginx/{$site->flag}") . 'frontend.conf';
         $servers = Servers::field('id, public_ip, private_ip, type')->select()->column(null, 'id');
         $records = $execs = $deploys = [];
-        $confServers = $hosts = '';
+        $confServers = '';
         foreach ($backIds as $backId) {
             $random = $site->flag . substr(md5($site->site_name . uuid()), 0, 10);
             $records[] = $random;
@@ -63,7 +63,9 @@ class Deploy extends AdminController
             ];
 
             $backendConf = lang('backend nginx conf', [
-                'random' => $random,
+                'port' => $site->port,
+                'publicIp' => $servers[$backId]['public_ip'],
+                'privateIp' => $servers[$backId]['private_ip'],
                 'originPath' => $site->origin_path,
             ]);
             $backendConfPath = runtime_path("nginx/{$site->flag}") . "{$random}.conf";
@@ -74,9 +76,7 @@ class Deploy extends AdminController
             $execs[] = "/usr/bin/rsync -vzrtopg --omit-dir-times --delete --exclude \".git\" --exclude \".gitignore\" --exclude \".env\" --exclude \"runtime\" {$site->base_path}/ root@{$servers[$backId]['public_ip']}:{$site->origin_path}/";
             // 远程执行后端服务器命令
             $execs[] = "ssh root@{$servers[$backId]['public_ip']} \"chown nginx.nginx {$site->origin_path} -R;nginx -s reload\"";
-            // 节点服务器的hosts
-            $hosts .= "{$servers[$backId]['public_ip']}      {$random}" . PHP_EOL;
-            $confServers .= PHP_EOL . "    server {$random};";
+            $confServers .= PHP_EOL . "    server {$servers[$backId]['public_ip']}:{$site->port};";
         }
         // 节点Nginx配置域名
         $webDomains = $site->webDomains->column('domain');
@@ -137,7 +137,7 @@ class Deploy extends AdminController
                 'server_type' => 2,
             ];
             $execs[] = "scp {$frontendConfPath} root@{$servers[$frontId]['public_ip']}:/etc/nginx/conf.d/{$site->flag}.conf";
-            $execs[] = "ssh root@{$servers[$frontId]['public_ip']} \"echo '{$hosts}' >> /etc/hosts;nginx -s reload\"";
+            $execs[] = "ssh root@{$servers[$frontId]['public_ip']} \"nginx -s reload\"";
         }
         $site->deployed = 1;
         $site->save();

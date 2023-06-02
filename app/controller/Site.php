@@ -71,7 +71,7 @@ class Site extends AdminController
         // 将后端部署host，站点ID，站点域名写入Nginx配置文件
         foreach ($deploys as $deploy) {
             if ($deploy->server_type == 1) {
-                $servers .= PHP_EOL . "    server {$deploy->private_domain};";
+                $servers .= PHP_EOL . "    server {$deploy->servers->public_ip}:{$site->port};";
             }
         }
         $webDomains = $site->webDomains->column('domain');

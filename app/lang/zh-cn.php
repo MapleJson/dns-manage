@@ -28,8 +28,8 @@ return [
     'Admin modification failed'                   => '管理员修改失败',
     'backend nginx conf'                          => <<<EOF
 server {
-    listen       80;
-    server_name  {:random};
+    listen       {:port};
+    server_name  {:publicIp} {:privateIp};
     root         "{:originPath}/public";
     index index.php index.html;
 
