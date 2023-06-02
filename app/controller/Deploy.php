@@ -84,11 +84,11 @@ class Deploy extends AdminController
             $webDomains[] = "www.{$webDomain}";
         }
         // 后台域名前缀
-        $adminRecord = "admin{$site->flag}" . array_rand($records);
+        $adminRecord = "admin{$site->flag}" . $records[array_rand($records)];
         // 添加后台的A记录至节点的域名
         $backendDns = CfServer::instance()->addDns($site->domains->zone_identifier, [
             'name' => $adminRecord,
-            'content' => $servers[array_rand($frontIds)]['public_ip'],
+            'content' => $servers[$frontIds[array_rand($frontIds)]]['public_ip'],
             'comment' => $site->site_name . '后台',
         ]);
         if ($backendDns['success']) {
@@ -114,7 +114,7 @@ class Deploy extends AdminController
         // 添加前台的A记录至节点的域名
         foreach ($frontIds as $frontId) {
             $frontendDns = CfServer::instance()->addDns($site->domains->zone_identifier, [
-                'name' => array_rand($records),
+                'name' => $records[array_rand($records)],
                 'content' => $servers[$frontId]['public_ip'],
                 'comment' => $site->site_name . '前台',
             ]);

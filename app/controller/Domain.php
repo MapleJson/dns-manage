@@ -59,7 +59,7 @@ class Domain extends AdminController
                         $mainDns = CfServer::instance()->addDns($domain['result']['id'], [
                             'type' => 'CNAME',
                             'name' => '@',
-                            'content' => array_rand($records),
+                            'content' => $records[array_rand($records)],
                             'comment' => $site->site_name . '前台',
                         ]);
                         $dns = [];
@@ -77,7 +77,7 @@ class Domain extends AdminController
                         $wwwDns = CfServer::instance()->addDns($domain['result']['id'], [
                             'type' => 'CNAME',
                             'name' => 'www',
-                            'content' => array_rand($records),
+                            'content' => $records[array_rand($records)],
                             'comment' => $site->site_name . '前台',
                         ]);
                         if ($wwwDns['success']) {
