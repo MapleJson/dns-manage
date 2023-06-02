@@ -9,12 +9,6 @@ use app\service\CfServer;
 
 class Deploy extends AdminController
 {
-    protected function initialize()
-    {
-        parent::initialize();
-        $this->model = new \app\model\Deploy();
-    }
-
     public function index()
     {
         $where = [];
@@ -33,7 +27,7 @@ class Deploy extends AdminController
         if (!$this->permissions()) {
             return message('无权操作');
         }
-        $site = $this->model->getById(intval(input('post.site_id')));
+        $site = Sites::getById(intval(input('post.site_id')));
         if (!$site->isExists()) {
             return message('The data does not exist');
         }
@@ -145,7 +139,7 @@ class Deploy extends AdminController
         }
         $site->deployed = 1;
         $site->save();
-        $this->model->saveAll($deploys);
+        \app\model\Deploy::saveAll($deploys);
 
         $execRes = [];
         foreach ($execs as $exec) {
