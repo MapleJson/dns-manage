@@ -23,7 +23,7 @@ class Shell extends AdminController
         if (!empty(input('get.site_id'))) {
             $where['site_id'] = input('get.site_id');
         }
-        $list = Exec::getPageList($where);
+        $list = Exec::where($where)->order('id', 'asc')->paginate(20);
         $sites = Sites::field('id, site_name')->select()->column(null, 'id');
         return $this->view('list', compact('list', 'sites'));
     }
