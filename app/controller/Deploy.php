@@ -84,7 +84,7 @@ class Deploy extends AdminController
             $webDomains[] = "www.{$webDomain}";
         }
         // 后台域名前缀
-        $adminRecord = "admin{$site->flag}" . $records[array_rand($records)];
+        $adminRecord = "admin{$records[array_rand($records)]}";
         // 添加后台的A记录至节点的域名
         $backendDns = CfServer::instance()->addDns($site->domains->zone_identifier, [
             'name' => $adminRecord,
@@ -110,12 +110,10 @@ class Deploy extends AdminController
             'domains' => implode(' ', $webDomains),
             'servers' => $confServers,
         ]);
-        file_put_contents($frontendConfPath, $frontendConf);
-        // 添加前台的A记录至节点的域名
-        foreach ($frontIds as $frontId) {
+        foreach ($records as $record) {
             $frontendDns = CfServer::instance()->addDns($site->domains->zone_identifier, [
-                'name' => $records[array_rand($records)],
-                'content' => $servers[$frontId]['public_ip'],
+                'name' => $record,
+                'content' => $servers[$frontIds[array_rand($frontIds)]]['public_ip'],
                 'comment' => $site->site_name . '前台',
             ]);
             if ($frontendDns['success']) {
@@ -129,6 +127,10 @@ class Deploy extends AdminController
                     'identifier' => $frontendDns['result']['id'],
                 ]);
             }
+        }
+        // 添加前台的A记录至节点的域名
+        file_put_contents($frontendConfPath, $frontendConf);
+        foreach ($frontIds as $frontId) {
             $deploys[] = [
                 'site_id' => $site->id,
                 'server_id' => intval($frontId),
@@ -142,10 +144,10 @@ class Deploy extends AdminController
         (new \app\model\Deploy)->saveAll($deploys);
 
         $execRes = [];
+        dump($execs);
         foreach ($execs as $exec) {
             $execRes[] = shell_exec($exec);
         }
-        halt($execs);
         return message(json_encode($execRes));
     }
 }
