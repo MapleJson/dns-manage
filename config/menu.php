@@ -22,6 +22,11 @@ return [
         'icon' => 'fa-server',
     ],
     [
+        'name' => '执行命令',
+        'url' => url('shell-index'),
+        'icon' => 'fa-server',
+    ],
+    [
         'name' => 'DNS管理',
         'url' => url('record-index'),
         'icon' => 'fa-dna',
