@@ -94,7 +94,6 @@ class Domain extends AdminController
                         empty($dns) ?: (new Records())->saveAll($dns);
                     }
                 }
-
             }
             return message('Submission successfully');
         }

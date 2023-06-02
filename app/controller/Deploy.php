@@ -76,7 +76,7 @@ class Deploy extends AdminController
             $execs[] = "ssh root@{$servers[$backId]['public_ip']} \"chown nginx.nginx {$site->origin_path} -R;nginx -s reload\"";
             // 节点服务器的hosts
             $hosts .= "{$servers[$backId]['public_ip']}      {$random}" . PHP_EOL;
-            $confServers .= "server {$random};" . PHP_EOL;
+            $confServers .= PHP_EOL . "    server {$random};";
         }
         // 节点Nginx配置域名
         $webDomains = $site->webDomains->column('domain');

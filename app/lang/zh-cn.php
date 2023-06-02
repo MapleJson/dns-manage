@@ -28,7 +28,7 @@ return [
     'Admin modification failed'                   => '管理员修改失败',
     'backend nginx conf'                          => <<<EOF
 server {
-        listen       80;
+    listen       80;
     server_name  {:random};
     root         "{:originPath}/public";
     index index.php index.html;
@@ -58,8 +58,7 @@ EOF,
 
     'frontend nginx conf' => <<<EOF
 upstream balanced{:siteId} {
-    ip_hash;
-    {:servers}
+    ip_hash;{:servers}
 }
 server {
     listen       80;
