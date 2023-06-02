@@ -80,7 +80,7 @@ class Site extends AdminController
         }
         $webDomains[] = $site->backend_domain;
         $frontendConf = lang('frontend nginx conf', [
-            'siteId' => $site->id,
+            'flag' => $site->flag,
             'domains' => implode(' ', $webDomains),
             'servers' => $servers,
         ]);

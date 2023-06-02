@@ -4,6 +4,7 @@ namespace app\controller;
 use app\AdminController;
 use app\model\Records;
 use app\model\Servers;
+use app\model\Shell;
 use app\model\Sites;
 use app\service\CfServer;
 
@@ -63,6 +64,7 @@ class Deploy extends AdminController
             ];
 
             $backendConf = lang('backend nginx conf', [
+                'flag' => $site->flag,
                 'port' => $site->port,
                 'publicIp' => $servers[$backId]['public_ip'],
                 'privateIp' => $servers[$backId]['private_ip'],
@@ -78,6 +80,7 @@ class Deploy extends AdminController
             $execs[] = "ssh root@{$servers[$backId]['public_ip']} \"chown nginx.nginx {$site->origin_path} -R;nginx -s reload\"";
             $confServers .= PHP_EOL . "    server {$servers[$backId]['public_ip']}:{$site->port};";
         }
+
         // 节点Nginx配置域名
         $webDomains = $site->webDomains->column('domain');
         foreach ($webDomains as $webDomain) {
@@ -106,10 +109,22 @@ class Deploy extends AdminController
         }
         // 节点Nginx配置文件
         $frontendConf = lang('frontend nginx conf', [
-            'siteId' => $site->id,
+            'flag' => $site->flag,
             'domains' => implode(' ', $webDomains),
             'servers' => $confServers,
         ]);
+        // 添加前台的A记录至节点的域名
+        file_put_contents($frontendConfPath, $frontendConf);
+        foreach ($frontIds as $frontId) {
+            $deploys[] = [
+                'site_id' => $site->id,
+                'server_id' => intval($frontId),
+                'server_type' => 2,
+            ];
+            $execs[] = "scp {$frontendConfPath} root@{$servers[$frontId]['public_ip']}:/etc/nginx/conf.d/{$site->flag}.conf";
+            $execs[] = "ssh root@{$servers[$frontId]['public_ip']} \"nginx -s reload\"";
+        }
+        // 添加前台A记录
         foreach ($records as $record) {
             $frontendDns = CfServer::instance()->addDns($site->domains->zone_identifier, [
                 'name' => $record,
@@ -128,26 +143,18 @@ class Deploy extends AdminController
                 ]);
             }
         }
-        // 添加前台的A记录至节点的域名
-        file_put_contents($frontendConfPath, $frontendConf);
-        foreach ($frontIds as $frontId) {
-            $deploys[] = [
-                'site_id' => $site->id,
-                'server_id' => intval($frontId),
-                'server_type' => 2,
-            ];
-            $execs[] = "scp {$frontendConfPath} root@{$servers[$frontId]['public_ip']}:/etc/nginx/conf.d/{$site->flag}.conf";
-            $execs[] = "ssh root@{$servers[$frontId]['public_ip']} \"nginx -s reload\"";
-        }
         $site->deployed = 1;
         $site->save();
         (new \app\model\Deploy)->saveAll($deploys);
 
-        $execRes = [];
-        dump($execs);
+        $shell = [];
         foreach ($execs as $exec) {
-            $execRes[] = shell_exec($exec);
+            $shell[] = [
+                'site_id' => $site->id,
+                'shell' => $exec,
+            ];
         }
-        return message(json_encode($execRes));
+        (new Shell())->saveAll($shell);
+        return message('Deploy successfully');
     }
 }

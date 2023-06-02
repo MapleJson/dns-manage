@@ -16,6 +16,7 @@ return [
     'Password change failed'                      => '密码修改失败',
 
     'Submitted successfully'                      => '提交成功',
+    'Deploy successfully'                         => '部署成功,请前往执行脚本',
     'Submission Failed'                           => '提交失败',
     'Delete successfully'                         => '删除成功',
     'Delete Failed'                               => '删除失败',
@@ -51,13 +52,13 @@ server {
         fastcgi_param  PATH_TRANSLATED  \$document_root\$fastcgi_path_info;
         include        fastcgi_params;
     }
-    access_log  /var/log/nginx/{:random}.log;
-    error_log  /var/log/nginx/{:random}.error.log;
+    access_log  /var/log/nginx/{:flag}.log;
+    error_log  /var/log/nginx/{:flag}.error.log;
 }
 EOF,
 
     'frontend nginx conf' => <<<EOF
-upstream balanced{:siteId} {
+upstream balanced{:flag} {
     ip_hash;{:servers}
 }
 server {
@@ -73,8 +74,8 @@ server {
         proxy_send_timeout         300;		#后端服务器数据回传时间(代理发送超时)
         proxy_read_timeout         300;		#连接成功后，后端服务器响应时间(代理接收超时)
     }
-    access_log  /var/log/nginx/balanced{:siteId}.log;
-    error_log  /var/log/nginx/balanced{:siteId}.error.log;
+    access_log  /var/log/nginx/balanced{:flag}.log;
+    error_log  /var/log/nginx/balanced{:flag}.error.log;
 }
 EOF,
 
