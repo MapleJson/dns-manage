@@ -22,6 +22,8 @@ return [
     'Delete Failed'                               => '删除失败',
     'Edit successfully'                           => '修改成功',
     'Edit Failed'                                 => '修改失败',
+    'Exec successfully'                           => '执行成功',
+    'Exec Failed'                                 => '执行失败',
 
     'The data does not exist'                     => '该条数据不存在',
     'The admin does not exist'                    => '该管理员不存在',

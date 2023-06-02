@@ -43,15 +43,15 @@ class Deploy extends AdminController
         }
         $backIds = input('post.back_ids');
         $frontIds = input('post.front_ids');
+        $records = $execs = $deploys = [];
         // 程序依赖安装
-        shell_exec("cd {$site->base_path} && composer install");
+        $execs[] = "cd {$site->base_path} && composer install";
         // Nginx配置文件目录
         if (!is_dir(runtime_path("nginx/{$site->flag}"))) {
             mkdir(runtime_path("nginx/{$site->flag}"));
         }
         $frontendConfPath = runtime_path("nginx/{$site->flag}") . 'frontend.conf';
         $servers = Servers::field('id, public_ip, private_ip, type')->select()->column(null, 'id');
-        $records = $execs = $deploys = [];
         $confServers = '';
         foreach ($backIds as $backId) {
             $random = $site->flag . substr(md5($site->site_name . uuid()), 0, 10);
