@@ -108,7 +108,7 @@ class Deploy extends AdminController
         $frontendConf = lang('frontend nginx conf', [
             'siteId' => $site->id,
             'domains' => implode(' ', $webDomains),
-            'servers' => $servers,
+            'servers' => $confServers,
         ]);
         file_put_contents($frontendConfPath, $frontendConf);
         // 添加前台的A记录至节点的域名
