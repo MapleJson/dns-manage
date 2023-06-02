@@ -7,6 +7,7 @@ use app\AdminController;
 use app\model\Domains;
 use app\model\Records;
 use app\model\Sites;
+use app\service\CfServer;
 
 class Record extends AdminController
 {
@@ -47,22 +48,11 @@ class Record extends AdminController
         }
         $site = Sites::getById(intval(input('post.site_id')));
         $domain = Domains::getById(intval(input('post.domain_id')));
-        $result = curl_http(
-            "https://api.cloudflare.com/client/v4/zones/{$domain->zone_identifier}/dns_records",
-            'POST',
-            [
-                'type' => 'A',
-                'name' => input('post.name'),
-                'content' => input('post.content'),
-                'comment' => empty(input('post.comment')) ? $site->site_name : input('post.comment'),
-                'proxied' => true,
-            ],
-            [
-                'Authorization: Bearer ' . env('cf.auth_key'),
-                'Content-Type: application/json'
-            ]
-        );
-        $record = json_decode($result, true);
+        $dns = input();
+        if (empty($dns['comment'])) {
+            $dns['comment'] = $site->site_name;
+        }
+        $record = CfServer::instance()->addDns($domain->zone_identifier, $dns);
         if ($record['success']) {
             request()->withPost(['identifier' => $record['result']['id']]);
             return parent::save();
@@ -83,16 +73,7 @@ class Record extends AdminController
         if (empty($record->domains->zone_identifier) || empty($record->identifier)) {
             return parent::delete();
         }
-        $result = curl_http(
-            "https://api.cloudflare.com/client/v4/zones/{$record->domains->zone_identifier}/dns_records/{$record->identifier}",
-            'DELETE',
-            [],
-            [
-                'Authorization: Bearer ' . env('cf.auth_key'),
-                'Content-Type: application/json'
-            ]
-        );
-        $delete = json_decode($result, true);
+        $delete = CfServer::instance()->delDns($record->domains->zone_identifier, $record->identifier);
 
         if ($delete['success']) {
             return parent::delete();

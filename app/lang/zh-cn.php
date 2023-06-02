@@ -26,6 +26,58 @@ return [
     'The admin does not exist'                    => '该管理员不存在',
     'Admin modified successfully'                 => '管理员修改成功',
     'Admin modification failed'                   => '管理员修改失败',
+    'backend nginx conf'                          => <<<EOF
+server {
+        listen       80;
+    server_name  {:random};
+    root         "{:originPath}/public";
+    index index.php index.html;
+
+    location ~* (runtime|application)/{
+            return 403;
+        }
+    location / {
+            if (!-e \$request_filename){
+                rewrite  ^(.*)$  /index.php?s=\$1 last; break;
+        }
+    }
+    location ~ \.php(.*)$ {
+        fastcgi_hide_header X-Powered-By;
+        fastcgi_pass   127.0.0.1:9000;
+        fastcgi_index  index.php;
+        fastcgi_split_path_info  ^((?U).+\.php)(/?.+)$;
+        fastcgi_param  SCRIPT_FILENAME  \$document_root\$fastcgi_script_name;
+        fastcgi_param  PATH_INFO  \$fastcgi_path_info;
+        fastcgi_param  PATH_TRANSLATED  \$document_root\$fastcgi_path_info;
+        include        fastcgi_params;
+    }
+    access_log  /var/log/nginx/{:random}.log;
+    error_log  /var/log/nginx/{:random}.error.log;
+}
+EOF,
+
+    'frontend nginx conf' => <<<EOF
+upstream balanced{:siteId} {
+    ip_hash;
+    {:servers}
+}
+server {
+    listen       80;
+    server_name  {:domains};
+    location / {
+        proxy_pass http://balanced{:siteId};
+        proxy_set_header X-Read-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        client_max_body_size       8m;		#允许客户端请求的最大单文件字节数
+        client_body_buffer_size    128k;	#缓冲区代理缓冲用户端请求的最大字节数
+        proxy_connect_timeout      300;		#nginx跟后端服务器连接超时时间(代理连接超时)
+        proxy_send_timeout         300;		#后端服务器数据回传时间(代理发送超时)
+        proxy_read_timeout         300;		#连接成功后，后端服务器响应时间(代理接收超时)
+    }
+    access_log  /var/log/nginx/balanced{:siteId}.log;
+    error_log  /var/log/nginx/balanced{:siteId}.error.log;
+}
+EOF,
 
     'useStatus' => [
         1 => '正常',
@@ -33,8 +85,8 @@ return [
     ],
 
     'type' => [
-        1 => '后端服务器',
-        2 => '节点服务器',
+        1 => '后端',
+        2 => '节点',
     ],
 
     'siteStatus' => [

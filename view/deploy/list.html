@@ -1,6 +1,6 @@
 {extend name='common/layout' /}
 
-{block name='title'}域名列表{/block}
+{block name='title'}站点管理{/block}
 
 {block name='css'}
 <!-- DataTables -->
@@ -11,28 +11,36 @@
 <link rel="stylesheet" href="/static/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
 <!-- SweetAlert2 -->
 <link rel="stylesheet" href="/static/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
+<!-- iCheck for checkboxes and radio inputs -->
+<link rel="stylesheet" href="/static/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
 {/block}
 
 {block name='search'}
-<form action="{:url('domain-index')}" method="get">
+<form action="{:url('deploy-index')}" method="get">
     <div class="form-row">
         <div class="col-md-2 mb-3">
-            <input type="text" class="form-control" name="domain" placeholder="域名" value="{$Request.param.domain}">
+            <select class="form-control select2" name="server_id">
+                <option value="">服务器</option>
+                {volist name='servers' id='server'}
+                <option {if $Request.param.server_id == $server.id}selected{/if}
+                value="{$server.id}">{$server.server_name}</option>
+                {/volist}
+            </select>
         </div>
         <div class="col-md-2 mb-3">
             <select class="form-control select2" name="site_id">
                 <option value="">站点</option>
-                {volist name='sites' id='site'}
-                <option {if $Request.param.site_id== $site.id}selected{/if}
-                value="{$site.id}">{$site.site_name}</option>
-                {/volist}
+                {foreach $sites as $key => $val}
+                <option {if $Request.param.site_id == $key}selected{/if}
+                value="{$key}">{$val.site_name}</option>
+                {/foreach}
             </select>
         </div>
         <div class="col-md-1 mb-3">
             <button class="btn btn-primary" type="submit">搜索</button>
         </div>
         <div class="col-md-1 mb-3">
-            <button class="btn btn-success" data-toggle="modal" data-target="#add-domain" type="button">新增</button>
+            <button class="btn btn-success" data-toggle="modal" data-target="#add-deploy" type="button">开始部署</button>
         </div>
     </div>
 </form>
@@ -42,25 +50,24 @@
 <tr class="text-center">
     <th>编号</th>
     <th>站点名称</th>
-    <th>域名</th>
-    <th>备注</th>
+    <th>站点自定义域名</th>
+    <th>服务器</th>
+    <th>服务器类型</th>
     <th>创建时间</th>
-    <th>操作</th>
 </tr>
 {/block}
 
 {block name='tbody'}
-{volist name='list' id='domain'}
+{volist name='list' id='deploy'}
 <tr class="text-center">
-    <td>{$domain.id}</td>
-    <td>{$domain.site_name}</td>
-    <td>{$domain.domain}</td>
-    <td>{$domain.remark}</td>
-    <td>{$domain.create_time}</td>
-    <td class="text-center">
-        <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#add-domain" onclick="showUpdate({$domain})" type="button">编辑</button>
-        <a class="btn btn-danger btn-sm" href="{:url('domain-delete', ['id' => $domain.id])}">删除</a>
+    <td>{$deploy.id}</td>
+    <td>{$deploy.sites.site_name}</td>
+    <td>{$deploy.private_domain}</td>
+    <td>{$deploy.servers.server_name}</td>
+    <td class="{if $deploy.server_type === 1}text-success{else/}text-danger{/if}">
+        {$type[$deploy.server_type]}
     </td>
+    <td>{$deploy.create_time}</td>
 </tr>
 {/volist}
 {/block}
@@ -82,48 +89,64 @@
 
 {block name='dialog'}
 <!-- Add Details Modal -->
-<div class="modal fade" id="add-domain" aria-hidden="true" role="dialog">
-    <div class="modal-dialog">
+<div class="modal fade" id="add-deploy" aria-hidden="true" role="dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">添加/编辑-域名</h5>
+                <h5 class="modal-title">部署站点</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form action="{:url('domain-create')}" method="POST" id="add-domain-form" role="form">
+                <form action="{:url('deploy-create')}" method="POST" id="add-data-form" role="form">
                     {:token_field()}
-                    <input type="hidden" value="0" name="id" />
                     <div class="row form-row">
                         <div class="col-12">
                             <div class="form-group">
-                                <label>域名</label>
-                                <div>
-                                    <input type="text" name="domain" autocomplete="off" class="form-control">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="form-group">
-                                <label>站点</label>
+                                <label>选择站点</label>
                                 <select class="form-control select2" name="site_id">
                                     <option value="0">请选择站点</option>
                                     {volist name='sites' id='site'}
-                                    <option {if $Request.param.site_id== $site.id}selected{/if}
-                                    value="{$site.id}">{$site.site_name}</option>
+                                        {if $site.deployed == 0}
+                                        <option {if $Request.param.site_id == $site.id}selected{/if}
+                                        value="{$site.id}">{$site.site_name}</option>
+                                        {/if}
                                     {/volist}
                                 </select>
                             </div>
                         </div>
-                        <div class="col-12">
+                        <div class="col-6">
                             <div class="form-group">
-                                <label>备注</label>
-                                <div>
-                                    <textarea name="remark" autocomplete="off" class="form-control"></textarea>
-                                </div>
+                                <label class="text-danger">后端服务器</label>
+                                {volist name='servers' id='server'}
+                                    {if $server.type == 1}
+                                    <div class="icheck-primary">
+                                        <input type="checkbox" id="checkboxBack{$server.id}" value="{$server.id}" name="back_ids[]">
+                                        <label for="checkboxBack{$server.id}">
+                                            {$server.server_name}
+                                        </label>
+                                    </div>
+                                    {/if}
+                                {/volist}
                             </div>
                         </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label class="text-info">节点服务器</label>
+                                {volist name='servers' id='server'}
+                                    {if $server.type == 2}
+                                    <div class="icheck-primary">
+                                        <input type="checkbox" id="checkboxFront{$server.id}" value="{$server.id}" name="front_ids[]">
+                                        <label for="checkboxFront{$server.id}">
+                                            {$server.server_name}
+                                        </label>
+                                    </div>
+                                    {/if}
+                                {/volist}
+                            </div>
+                        </div>
+
                     </div>
                     <div class="modal-footer justify-content-between">
                         <button type="submit" class="btn btn-primary">确认</button>
@@ -151,16 +174,4 @@
 <script src="/static/plugins/select2/js/select2.full.min.js"></script>
 <!-- SweetAlert2 -->
 <script src="/static/plugins/sweetalert2/sweetalert2.min.js"></script>
-<!-- validate rule -->
-<script src="/static/js/validate.js"></script>
-<script>
-    function showUpdate(data) {
-        $('#add-domain-form').attr('action', '{:url("domain-update")}')
-        $('#add-domain-form input[name=id]').val(data.id)
-        $('#add-domain-form input[name=domain]').val(data.domain)
-        $('#add-domain-form textarea[name=remark]').val(data.remark)
-        $('#add-domain-form select[name=site_id] option[value=' + data.site_id +']').attr('selected', true)
-        $('#add-domain-form select').select2()
-    }
-</script>
 {/block}

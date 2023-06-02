@@ -10,30 +10,14 @@ use app\BaseModel;
  */
 class Sites extends BaseModel
 {
-    public function servers()
-    {
-        return $this->belongsTo(Servers::class, 'server_id', 'id');
-    }
-
-    public function frontServers()
-    {
-        return $this->belongsTo(Servers::class, 'front_server_id', 'id');
-    }
-
     public function domains()
     {
-        return $this->belongsTo(Domains::class, 'a_domain_id', 'id');
+        return $this->belongsTo(Domains::class, 'a_domain_id');
     }
 
-    public function backRecords()
+    public function webDomains()
     {
-        return $this->belongsTo(Records::class, 'back_a_record_id', 'id');
+        return $this->hasMany(Domains::class, 'site_id');
     }
-
-    public function frontRecords()
-    {
-        return $this->belongsTo(Records::class, 'front_a_record_id', 'id');
-    }
-
 
 }

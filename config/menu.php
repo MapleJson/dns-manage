@@ -7,9 +7,9 @@ return [
         'icon' => 'fa-home',
     ],
     [
-        'name' => '服务器管理',
-        'url' => url('server-index'),
-        'icon' => 'fa-server',
+        'name' => '站点管理',
+        'url' => url('site-index'),
+        'icon' => 'fa-sitemap',
     ],
     [
         'name' => '域名管理',
@@ -17,14 +17,19 @@ return [
         'icon' => 'fa-link',
     ],
     [
+        'name' => '部署管理',
+        'url' => url('deploy-index'),
+        'icon' => 'fa-server',
+    ],
+    [
         'name' => 'DNS管理',
         'url' => url('record-index'),
         'icon' => 'fa-dna',
     ],
     [
-        'name' => '站点管理',
-        'url' => url('site-index'),
-        'icon' => 'fa-sitemap',
+        'name' => '服务器管理',
+        'url' => url('server-index'),
+        'icon' => 'fa-server',
     ],
     [
         'name' => '管理员管理',

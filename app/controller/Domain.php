@@ -5,7 +5,9 @@ namespace app\controller;
 
 use app\AdminController;
 use app\model\Domains;
+use app\model\Records;
 use app\model\Sites;
+use app\service\CfServer;
 
 class Domain extends AdminController
 {
@@ -42,25 +44,59 @@ class Domain extends AdminController
         if (!$this->permissions()) {
             return message('无权操作');
         }
-        $result = curl_http(
-            "https://api.cloudflare.com/client/v4/zones",
-            'POST',
-            [
-                'type' => 'full',
-                'name' => input('post.domain'),
-                'account' => [
-                    'id' => env('cf.account_id')
-                ]
-            ],
-            [
-                'Authorization: Bearer ' . env('cf.auth_key'),
-                'Content-Type: application/json'
-            ]
-        );
-        $domain = json_decode($result, true);
+        $domain = CfServer::instance()->addZone(input('post.domain'));
         if ($domain['success']) {
             request()->withPost(['zone_identifier' => $domain['result']['id']]);
-            return parent::save();
+            $domainRes = Domains::create(array_merge(input(), request()->post()));
+            if ($domainRes->isEmpty()) {
+                return message('Submission Failed');
+            }
+            if (!empty(input('post.site_id'))) {
+                $site = Sites::getById(intval(input('post.site_id')));
+                if ($site->deployed == 1) {
+                    $records = Records::where('site_id', $site->id)->where('domain_id', $site->a_domain_id)->select()->column('name');
+                    if (!empty($records)) {
+                        $mainDns = CfServer::instance()->addDns($domain['result']['id'], [
+                            'type' => 'CNAME',
+                            'name' => '@',
+                            'content' => array_rand($records),
+                            'comment' => $site->site_name . '前台',
+                        ]);
+                        $dns = [];
+                        if ($mainDns['success']) {
+                            $dns[] = [
+                                'domain_id' => $domainRes->id,
+                                'site_id' => $site->id,
+                                'type' => $mainDns['result']['type'],
+                                'name' => $mainDns['result']['name'],
+                                'content' => $mainDns['result']['content'],
+                                'comment' => $mainDns['result']['comment'],
+                                'identifier' => $mainDns['result']['id'],
+                            ];
+                        }
+                        $wwwDns = CfServer::instance()->addDns($domain['result']['id'], [
+                            'type' => 'CNAME',
+                            'name' => 'www',
+                            'content' => array_rand($records),
+                            'comment' => $site->site_name . '前台',
+                        ]);
+                        if ($wwwDns['success']) {
+                            $dns[] = [
+                                'domain_id' => $domainRes->id,
+                                'site_id' => $site->id,
+                                'type' => $wwwDns['result']['type'],
+                                'name' => $wwwDns['result']['name'],
+                                'content' => $wwwDns['result']['content'],
+                                'comment' => $wwwDns['result']['comment'],
+                                'identifier' => $wwwDns['result']['id'],
+                            ];
+                        }
+                        empty($dns) ?: Records::saveAll($dns);
+                    }
+                }
+
+            }
+            return message('Submission successfully');
         }
         return message('Submission Failed');
     }
@@ -78,21 +114,22 @@ class Domain extends AdminController
         if (empty($domain->zone_identifier)) {
             return parent::delete();
         }
-        $result = curl_http(
-            "https://api.cloudflare.com/client/v4/zones/{$domain->zone_identifier}",
-            'DELETE',
-            [],
-            [
-                'Authorization: Bearer ' . env('cf.auth_key'),
-                'Content-Type: application/json'
-            ]
-        );
-        $delete = json_decode($result, true);
-
-        if ($delete['success']) {
-            return parent::delete();
+        // 先删dns记录
+        $records = Records::where('domain_id', $domain->id)->select();
+        if (!$records->isEmpty()) {
+            foreach ($records as $record) {
+                if (empty($record->identifier)) {
+                    Records::destroy($record->id);
+                }
+                $delete = CfServer::instance()->delDns($domain->zone_identifier, $record->identifier);
+                if ($delete['success'] || ($delete['errors'][0]['code'] == 81044)) {
+                    Records::destroy($record->id);
+                }
+            }
         }
-        if ($delete['errors'][0]['code'] == 1001) {
+
+        $delete = CfServer::instance()->delZone($domain->zone_identifier);
+        if ($delete['success'] || $delete['errors'][0]['code'] == 1001) {
             return parent::delete();
         }
         return message('Delete failed');
