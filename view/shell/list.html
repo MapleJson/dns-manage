@@ -45,7 +45,7 @@
 {volist name='list' id='shell'}
 <tr class="text-center">
     <td>{$shell.id}</td>
-    <td>{$sites[$shell.site_id].site_name}</td>
+    <td>{$sites[$shell.site_id]['site_name']}</td>
     <td>{$shell.shell}</td>
     <td class="text-center">
         <a class="btn btn-warning btn-sm" href="{:url('shell-do', ['id' => $shell.id])}">执行</a>
