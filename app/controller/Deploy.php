@@ -33,7 +33,7 @@ class Deploy extends AdminController
         if (!$this->permissions()) {
             return message('无权操作');
         }
-        $site = $this->model->getById(intval(input('post.id')));
+        $site = $this->model->getById(intval(input('post.site_id')));
         if (!$site->isExists()) {
             return message('The data does not exist');
         }
