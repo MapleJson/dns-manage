@@ -91,7 +91,7 @@ class Domain extends AdminController
                                 'identifier' => $wwwDns['result']['id'],
                             ];
                         }
-                        empty($dns) ?: Records::saveAll($dns);
+                        empty($dns) ?: (new Records())->saveAll($dns);
                     }
                 }
 

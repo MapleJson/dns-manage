@@ -139,7 +139,7 @@ class Deploy extends AdminController
         }
         $site->deployed = 1;
         $site->save();
-        \app\model\Deploy::saveAll($deploys);
+        (new \app\model\Deploy)->saveAll($deploys);
 
         $execRes = [];
         foreach ($execs as $exec) {
