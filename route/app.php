@@ -38,10 +38,13 @@ Route::group(function () {
     Route::get('site/change/domain', 'site/changeWebDomains')->name('site-change-domain');
     Route::get('site/delete', 'site/delete')->name('site-delete');
 
-    // 站点管理
+    // 部署管理
     Route::get('deploy/index', 'deploy/index')->name('deploy-index');
     Route::post('deploy/create', 'deploy/deploy')->name('deploy-create');
-    Route::get('site/delete', 'site/delete')->name('site-delete');
+
+    // 执行命令
+    Route::get('shell/index', 'shell/index')->name('shell-index');
+    Route::get('shell/do', 'shell/do')->name('shell-do');
 
     // 管理员管理
     Route::get('admin/index', 'admin/index')->name('admin-index');
