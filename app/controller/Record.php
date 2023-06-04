@@ -59,8 +59,10 @@ class Record extends AdminController
         }
         $record = CfServer::instance()->addDns($domain->zone_identifier, $dns);
         if ($record['success']) {
-            request()->withPost(['name' => $record['result']['name']]);
-            request()->withPost(['identifier' => $record['result']['id']]);
+            request()->withPost([
+                'name' => $record['result']['name'],
+                'identifier' => $record['result']['id']
+            ]);
             return parent::save();
         }
         return message('Submission Failed');
