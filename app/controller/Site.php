@@ -79,7 +79,9 @@ class Site extends AdminController
             $webDomains[] = "www.{$webDomain}";
         }
         foreach ($site->dns as $dns) {
-            $webDomains[] = $dns->name;
+            if ($dns->domain_id != $site->a_domain_id) {
+                $webDomains[] = $dns->name;
+            }
         }
         $frontendConf = lang('frontend nginx conf', [
             'flag' => $site->flag,
