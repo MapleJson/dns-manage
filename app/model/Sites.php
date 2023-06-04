@@ -20,4 +20,9 @@ class Sites extends BaseModel
         return $this->hasMany(Domains::class, 'site_id');
     }
 
+    public function dns()
+    {
+        return $this->hasMany(Records::class, 'site_id');
+    }
+
 }

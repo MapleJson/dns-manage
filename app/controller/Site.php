@@ -57,7 +57,7 @@ class Site extends AdminController
         if ($site->deployed == 0) {
             return message('此站点未部署');
         }
-        if ($site->webDomains->isEmpty()) {
+        if ($site->webDomains->isEmpty() && $site->dns->isEmpty()) {
             return message('此站点无关联域名');
         }
         $servers = '';
@@ -78,11 +78,14 @@ class Site extends AdminController
         foreach ($webDomains as $webDomain) {
             $webDomains[] = "www.{$webDomain}";
         }
+        foreach ($site->dns as $dns) {
+            $webDomains[] = $dns->name;
+        }
         $webDomains[] = $site->backend_domain;
         $frontendConf = lang('frontend nginx conf', [
             'flag' => $site->flag,
             'servers' => $servers,
-            'domains' => implode(' ', $webDomains),
+            'domains' => implode(' ', array_unique($webDomains)),
             'adminDomain' => $site->backend_domain,
         ]);
         file_put_contents($frontendConfPath, $frontendConf);
