@@ -15,7 +15,7 @@ return [
     'Successfully change password'                => '密码修改成功',
     'Password change failed'                      => '密码修改失败',
 
-    'Submitted successfully'                      => '提交成功',
+    'Submission successfully'                      => '提交成功',
     'Deploy successfully'                         => '部署成功,请前往执行脚本',
     'Submission Failed'                           => '提交失败',
     'Delete successfully'                         => '删除成功',

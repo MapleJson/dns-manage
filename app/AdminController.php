@@ -34,7 +34,7 @@ class AdminController extends BaseController
             return message('无权操作');
         }
         if ($this->model->save(array_merge(input(), request()->post()))) {
-            return message('Submitted successfully', false);
+            return message('Submission successfully', false);
         }
         return message('Submission Failed');
     }

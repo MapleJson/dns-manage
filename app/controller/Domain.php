@@ -95,7 +95,7 @@ class Domain extends AdminController
                     }
                 }
             }
-            return message('Submission successfully');
+            return message('Submission successfully', false);
         }
         return message('Submission Failed');
     }
