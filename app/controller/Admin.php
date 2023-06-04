@@ -35,6 +35,9 @@ class Admin extends AdminController
      */
     public function save()
     {
+        if (!$this->permissions()) {
+            return message('无权操作');
+        }
         $salt = salt();
         $result = Ad::create([
             'username' => input('post.username'),
