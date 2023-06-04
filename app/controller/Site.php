@@ -81,7 +81,6 @@ class Site extends AdminController
         foreach ($site->dns as $dns) {
             $webDomains[] = $dns->name;
         }
-        $webDomains[] = $site->backend_domain;
         $frontendConf = lang('frontend nginx conf', [
             'flag' => $site->flag,
             'servers' => $servers,
