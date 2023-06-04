@@ -105,13 +105,15 @@ class Deploy extends AdminController
                 'identifier' => $backendDns['result']['id'],
             ]);
             $site->backend_domain = $backendDns['result']['name'];
-            $webDomains[] = $backendDns['result']['name'];
+        } else {
+            $site->backend_domain = "{$adminRecord}.{$site->domains->domain}";
         }
         // 节点Nginx配置文件
         $frontendConf = lang('frontend nginx conf', [
             'flag' => $site->flag,
-            'domains' => implode(' ', $webDomains),
             'servers' => $confServers,
+            'domains' => implode(' ', $webDomains),
+            'adminDomain' => "{$adminRecord}.{$site->domains->domain}",
         ]);
         // 添加前台的A记录至节点的域名
         file_put_contents($frontendConfPath, $frontendConf);
