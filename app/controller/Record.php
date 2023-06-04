@@ -48,7 +48,12 @@ class Record extends AdminController
         }
         $site = Sites::getById(intval(input('post.site_id')));
         $domain = Domains::getById(intval(input('post.domain_id')));
-        $dns = input();
+        $dns = [
+            'type' => input('post.type'),
+            'name' => input('post.name'),
+            'content' => input('post.content'),
+            'comment' => input('post.comment'),
+        ];
         if (empty($dns['comment'])) {
             $dns['comment'] = $site->site_name;
         }
