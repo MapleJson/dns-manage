@@ -22,6 +22,9 @@ class Server extends AdminController
      */
     public function index()
     {
+        if (!$this->permissions()) {
+            return message('暂无信息');
+        }
         $where = [];
         if (!empty(input('get.public_ip'))) {
             $where[] = ['public_ip', 'like', '%' . trim(input('get.public_ip')) . '%'];
