@@ -33,7 +33,7 @@ class Site extends AdminController
         if (!empty(input('get.a_domain_id'))) {
             $where[] = ['a_domain_id', '=', intval(input('get.a_domain_id'))];
         }
-        $list = Sites::getPageList($where, "FIELD(status,3) desc,create_time desc");
+        $list = Sites::getPageList($where, 'id desc', "FIELD(status,1,2,3) Desc,create_time Desc");
         $siteStatus = lang('siteStatus');
         $areas = lang('area');
         foreach ($list as &$item) {

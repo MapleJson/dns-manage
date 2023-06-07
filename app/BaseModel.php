@@ -19,14 +19,16 @@ abstract class BaseModel extends Model
      *
      * @param array $where
      * @param string $orderBy
+     * @param string $orderRaw
      * @param mixed $field
      * @param int $limit
      * @return Paginator
      */
-    public static function getPageList(array $where = [], string $orderBy = 'id desc', $field = true, int $limit = 20)
+    public static function getPageList(array $where = [], string $orderBy = 'id desc', string $orderRaw = '', $field = true, int $limit = 20)
     {
         return static::field($field)
             ->where($where)
+            ->orderRaw($orderRaw)
             ->order($orderBy)
             ->paginate($limit);
     }
