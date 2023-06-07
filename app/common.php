@@ -23,6 +23,27 @@ if (!function_exists('uuid')) {
     }
 }
 
+if(!function_exists('fix_url')){
+    /**
+     * @param $url
+     * @param $def
+     * @param $prefix
+     * @return false|mixed|string
+     */
+    function fix_url($url,$def = false, $prefix = false) {
+        $url = trim($url);
+        if (empty($url)){
+            return $def;
+        }
+
+        if ( count(explode('://',$url))>1 ){
+            return $url;
+        }else{
+            return $prefix===false ? "https://{$url}" : $prefix.$url;
+        }
+    }
+}
+
 if (!function_exists('salt')) {
     /**
      * 获取全球唯一标识

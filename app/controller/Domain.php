@@ -34,6 +34,7 @@ class Domain extends AdminController
         $list = Domains::getPageList($where);
         foreach ($list as &$item) {
             $item->site_name = empty($item->sites) ? '' : $item->sites->site_name;
+            $item->domainUrl = fix_url($item->domain);
         }
         $sites = Sites::field('id, site_name')->select()->column(null, 'id');
         return $this->view('list', compact('list', 'sites'));

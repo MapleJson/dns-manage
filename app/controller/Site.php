@@ -39,6 +39,7 @@ class Site extends AdminController
         foreach ($list as &$item) {
             $item->aDomain = empty($item->domains) ? '' : $item->domains->domain;
             $item->webDomains = empty($item->webDomains) ? [] : $item->webDomains->column('domain');
+            $item->backend_domain_url = fix_url($item->backend_domain);
         }
         $domains = Domains::field('id, domain')->select()->column(null, 'id');
 

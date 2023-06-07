@@ -74,7 +74,7 @@
     <td>{$site.flag}</td>
     <td>{$site.port}</td>
     <td>{$site.aDomain}</td>
-    <td>{$site.backend_domain}</td>
+    <td><a href="{$site.backend_domain_url}" target="_blank">{$site.backend_domain}</a></td>
     <td class="{if $site.status === 1}text-blue{elseif $site.status === 2}text-info{elseif $site.status === 3}text-success{else/}text-danger{/if}">
         {$siteStatus[$site.status]}
     </td>
