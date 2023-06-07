@@ -10,7 +10,7 @@ build-job(main):
   # 仅针对main触发
   only:
     - main
-  # 仅针对tag为dev的runner触发
+  # 仅针对tag为deploy的runner触发
   tags:
     - deploy
   # 缓存目录
@@ -29,7 +29,7 @@ deploy-job(main):
   # 仅针对main触发
   only:
     - main
-  # 仅针对tag为dev的runner触发
+  # 仅针对tag为deploy的runner触发
   tags:
     - deploy
   # 依赖缓存任务
