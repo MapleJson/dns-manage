@@ -7,6 +7,7 @@ use think\db\exception\DataNotFoundException;
 use think\db\exception\DbException;
 use think\db\exception\ModelNotFoundException;
 use think\Model;
+use think\Paginator;
 
 /**
  * 控制器基础类
@@ -16,17 +17,17 @@ abstract class BaseModel extends Model
     /**
      * 获取分页数据
      *
-     * @param mixed $field
      * @param array $where
-     * @param int   $limit
-     * @return \think\Paginator
-     * @throws \think\db\exception\DbException
+     * @param string $orderBy
+     * @param mixed $field
+     * @param int $limit
+     * @return Paginator
      */
-    public static function getPageList(array $where = [], $field = true, int $limit = 20)
+    public static function getPageList(array $where = [], string $orderBy = 'id desc', $field = true, int $limit = 20)
     {
         return static::field($field)
             ->where($where)
-            ->order('id', 'desc')
+            ->order($orderBy)
             ->paginate($limit);
     }
 
