@@ -18,7 +18,7 @@ class Deploy extends AdminController
         }
         $list = \app\model\Deploy::getPageList($where);
         $servers = Servers::field('id, server_name, type')->select()->column(null, 'id');
-        $sites = Sites::field('id, site_name')->select()->column(null, 'id');
+        $sites = Sites::field('id, site_name, deployed')->select()->column(null, 'id');
         $type = lang('type');
         return $this->view('list', compact('list', 'servers', 'sites', 'type'));
     }
