@@ -34,7 +34,7 @@ class Domain extends AdminController
         $list = Domains::getPageList($where);
         foreach ($list as &$item) {
             $item->site_name = empty($item->sites) ? '' : $item->sites->site_name;
-            $item->site_status = empty($item->sites) ? '' : lang("siteStatus.{$item->sites->status}");
+            $item->site_status = empty($item->sites) ? '' : '(' . lang('siteStatus')[$item->sites->status] . ')';
             $item->domainUrl = fix_url($item->domain);
         }
         $siteStatus = lang('siteStatus');
