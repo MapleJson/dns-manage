@@ -38,7 +38,7 @@ class Record extends AdminController
             $item->nameUrl = fix_url($item->name);
         }
         $siteStatus = lang('siteStatus');
-        $domains = Domains::field('id, domain')->select()->column(null, 'id');
+        $domains = Domains::field('id, domain, remark, site_id')->order('site_id', 'asc')->select()->column(null, 'id');
         $sites = Sites::field('id, site_name, status')->select()->column(null, 'id');
         return $this->view('list', compact('list', 'domains', 'sites', 'siteStatus'));
     }

@@ -37,9 +37,6 @@
         <div class="col-md-2 mb-3">
             <input type="text" class="form-control" name="site_name" placeholder="站点名称" value="{$Request.param.site_name}">
         </div>
-        <div class="col-md-2 mb-3">
-            <input type="text" class="form-control" name="web_domains" placeholder="站点域名" value="{$Request.param.web_domains}">
-        </div>
         <div class="col-md-1 mb-3">
             <button class="btn btn-primary" type="submit">搜索</button>
         </div>
@@ -126,8 +123,10 @@
                                 <select class="form-control select2" name="a_domain_id">
                                     <option value="0">请选择域名</option>
                                     {volist name='domains' id='domain'}
+                                    {if $domain.site_id == 0}
                                     <option {if $Request.param.domain_id == $domain.id}selected{/if}
-                                    value="{$domain.id}">{$domain.domain}</option>
+                                    value="{$domain.id}">{$domain.domain} ({$domain.remark})</option>
+                                    {/if}
                                     {/volist}
                                 </select>
                             </div>

@@ -33,6 +33,9 @@ class Site extends AdminController
         if (!empty(input('get.a_domain_id'))) {
             $where[] = ['a_domain_id', '=', intval(input('get.a_domain_id'))];
         }
+        if (!empty(input('get.status'))) {
+            $where[] = ['status', '=', intval(input('get.status'))];
+        }
         $list = Sites::getPageList($where, "FIELD(status,1,2,3) Desc,create_time Desc");
         $siteStatus = lang('siteStatus');
         $areas = lang('area');
@@ -41,7 +44,7 @@ class Site extends AdminController
             $item->webDomains = empty($item->webDomains) ? [] : $item->webDomains->column('domain');
             $item->backend_domain_url = fix_url($item->backend_domain);
         }
-        $domains = Domains::field('id, domain')->select()->column(null, 'id');
+        $domains = Domains::field('id, domain, remark')->select()->column(null, 'id');
 
         return $this->view('list', compact('list', 'siteStatus', 'domains', 'areas'));
     }

@@ -125,7 +125,7 @@
                                     <option value="0">请选择域名</option>
                                     {volist name='domains' id='domain'}
                                     <option {if $Request.param.domain_id== $domain.id}selected{/if}
-                                    value="{$domain.id}">{$domain.domain}</option>
+                                    value="{$domain.id}">{$domain.domain} {if $domain.site_id == 0}({$domain.remark}){/if}</option>
                                     {/volist}
                                 </select>
                             </div>
