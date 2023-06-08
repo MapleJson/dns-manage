@@ -44,7 +44,7 @@ class Site extends AdminController
             $item->webDomains = empty($item->webDomains) ? [] : $item->webDomains->column('domain');
             $item->backend_domain_url = fix_url($item->backend_domain);
         }
-        $domains = Domains::field('id, domain, remark')->select()->column(null, 'id');
+        $domains = Domains::field('id, domain, site_id, remark')->select()->column(null, 'id');
 
         return $this->view('list', compact('list', 'siteStatus', 'domains', 'areas'));
     }
