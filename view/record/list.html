@@ -21,7 +21,7 @@
                 <option value="">站点</option>
                 {volist name='sites' id='site'}
                 <option {if $Request.param.site_id== $site.id}selected{/if}
-                value="{$site.id}">{$site.site_name}</option>
+                value="{$site.id}">{$site.site_name}($siteStatus[$site.status])</option>
                 {/volist}
             </select>
         </div>
@@ -113,7 +113,7 @@
                                     <option value="0">请选择站点</option>
                                     {volist name='sites' id='site'}
                                     <option {if $Request.param.site_id== $site.id}selected{/if}
-                                    value="{$site.id}">{$site.site_name}</option>
+                                    value="{$site.id}">{$site.site_name}($siteStatus[$site.status])</option>
                                     {/volist}
                                 </select>
                             </div>
