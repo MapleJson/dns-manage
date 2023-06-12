@@ -273,7 +273,7 @@
     function showUrl(data) {
         var frontUrlHtml = ''
         data.webDomains.forEach(function (item) {
-            frontUrlHtml += `<p><a href="https://www.${item}" target="_blank">https://www.${item}</a></p>`
+            frontUrlHtml += `<p><a href="${item}" target="_blank">${item}</a></p>`
         })
         $('#site-name').text(data.site_name)
         $('#backend-url').attr('href', 'https://' + data.backend_domain)
