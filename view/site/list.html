@@ -272,7 +272,7 @@
 <script>
     function showUrl(data) {
         var frontUrlHtml = ''
-        data.webDomains.forEach(function (item) {
+        data.webDomainsShow.forEach(function (item) {
             frontUrlHtml += `<p><a href="${item}" target="_blank">${item}</a></p>`
         })
         $('#site-name').text(data.site_name)

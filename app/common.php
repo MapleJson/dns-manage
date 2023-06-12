@@ -30,7 +30,7 @@ if(!function_exists('fix_url')){
      * @param $prefix
      * @return false|mixed|string
      */
-    function fix_url($url,$def = false, $prefix = false) {
+    function fix_url($url,$backend = false,$def = false, $prefix = false) {
         $url = trim($url);
         if (empty($url)){
             return $def;
@@ -39,7 +39,7 @@ if(!function_exists('fix_url')){
         if ( count(explode('://',$url))>1 ){
             return $url;
         }else{
-            if(count(explode('www.',$url))>1){
+            if(count(explode('www.',$url))>1 || $backend){
                 return $prefix===false ? "https://{$url}" : $prefix.$url;
             } else {
                 return $prefix===false ? "https://www.{$url}" : $prefix.$url;
