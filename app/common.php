@@ -39,7 +39,12 @@ if(!function_exists('fix_url')){
         if ( count(explode('://',$url))>1 ){
             return $url;
         }else{
-            return $prefix===false ? "https://{$url}" : $prefix.$url;
+            if(count(explode('www.',$url))>1){
+                return $prefix===false ? "https://{$url}" : $prefix.$url;
+            } else {
+                return $prefix===false ? "https://www.{$url}" : $prefix.$url;
+            }
+
         }
     }
 }
