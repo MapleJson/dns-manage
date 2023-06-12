@@ -25,11 +25,13 @@ class Record extends AdminController
     public function index()
     {
         $where = [];
+        $domainsWhere = [];
         if (!empty(input('get.domain_id'))) {
             $where['domain_id'] = input('get.domain_id');
         }
         if (!empty(input('get.site_id'))) {
             $where['site_id'] = input('get.site_id');
+            $domainsWhere['site_id'] = input('get.site_id');
         }
         $list = Records::getPageList($where);
         foreach ($list as &$item) {
@@ -37,10 +39,16 @@ class Record extends AdminController
             $item->site_name = empty($item->sites) ? '' : $item->sites->site_name;
             $item->nameUrl = fix_url($item->name);
         }
+<<<<<<< Updated upstream
         $siteStatus = lang('siteStatus');
         $domains = Domains::field('id, domain, remark, site_id')->order('site_id', 'asc')->select()->column(null, 'id');
         $sites = Sites::field('id, site_name, status')->select()->column(null, 'id');
         return $this->view('list', compact('list', 'domains', 'sites', 'siteStatus'));
+=======
+        $domains = Domains::field('id, domain')->where($domainsWhere)->select()->column(null, 'id');
+        $sites = Sites::field('id, site_name')->select()->column(null, 'id');
+        return $this->view('list', compact('list', 'domains', 'sites'));
+>>>>>>> Stashed changes
     }
 
     public function save()
