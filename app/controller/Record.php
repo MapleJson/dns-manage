@@ -37,7 +37,7 @@ class Record extends AdminController
         foreach ($list as &$item) {
             $item->domain = empty($item->domains) ? '' : $item->domains->domain;
             $item->site_name = empty($item->sites) ? '' : $item->sites->site_name;
-            $item->nameUrl = fix_url($item->name);
+            $item->nameUrl = fix_url($item->name, true);
         }
         $siteStatus = lang('siteStatus');
         $domains = Domains::field('id, domain, remark, site_id')->where($domainsWhere)->order('site_id', 'asc')->select()->column(null, 'id');
