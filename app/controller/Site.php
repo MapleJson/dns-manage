@@ -44,9 +44,10 @@ class Site extends AdminController
             $item->webDomains = empty($item->webDomains) ? [] : $item->webDomains->column('domain');
             $item->backend_domain_url = fix_url($item->backend_domain);
         }
+        $port = Sites::max('port') + 1;
         $domains = Domains::field('id, domain, site_id, remark')->select()->column(null, 'id');
 
-        return $this->view('list', compact('list', 'siteStatus', 'domains', 'areas'));
+        return $this->view('list', compact('list', 'siteStatus', 'domains', 'areas', 'port'));
     }
 
     public function changeWebDomains()
