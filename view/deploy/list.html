@@ -61,7 +61,7 @@
 {volist name='list' id='deploy'}
 <tr class="text-center">
     <td>{$deploy.id}</td>
-    <td>{$deploy.sites.site_name}</td>
+    <td>{$deploy.sites.site_name}({$siteStatus[$deploy.sites.status]})</td>
     <td>{$deploy.private_domain}</td>
     <td>{$deploy.servers.server_name}</td>
     <td class="{if $deploy.server_type === 1}text-success{else/}text-danger{/if}">
@@ -110,7 +110,7 @@
                                     {volist name='sites' id='site'}
                                         {if $site.deployed == 0}
                                         <option {if $Request.param.site_id == $site.id}selected{/if}
-                                        value="{$site.id}">{$site.site_name}</option>
+                                        value="{$site.id}">{$site.site_name}({$siteStatus[$site.status]})</option>
                                         {/if}
                                     {/volist}
                                 </select>

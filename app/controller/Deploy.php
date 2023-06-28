@@ -20,7 +20,8 @@ class Deploy extends AdminController
         $servers = Servers::field('id, server_name, type')->select()->column(null, 'id');
         $sites = Sites::field('id, site_name, deployed')->select()->column(null, 'id');
         $type = lang('type');
-        return $this->view('list', compact('list', 'servers', 'sites', 'type'));
+        $siteStatus = lang('siteStatus');
+        return $this->view('list', compact('list', 'servers', 'sites', 'type', 'siteStatus'));
     }
 
     public function deploy()
