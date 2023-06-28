@@ -32,7 +32,7 @@
                 <option value="">站点</option>
                 {foreach $sites as $key => $val}
                 <option {if $Request.param.site_id == $key}selected{/if}
-                value="{$key}">{$val.site_name}</option>
+                value="{$key}">{$val.site_name}({$siteStatus[$val.status]})</option>
                 {/foreach}
             </select>
         </div>
