@@ -41,12 +41,19 @@ class Site extends AdminController
         $areas = lang('area');
         foreach ($list as &$item) {
             $item->aDomain = empty($item->domains) ? '' : $item->domains->domain;
-            $item->webDomains = empty($item->webDomains) ? [] : $item->webDomains->column('domain');
-            $item->backend_domain_url = fix_url($item->backend_domain);
+            $array = [];
+            $item->webDomainsShow = [];
+            if(!empty($item->webDomains)){
+                $domainLists = $item->webDomains->column('domain');
+                foreach ($domainLists as $value){
+                    $array[] = fix_url($value);
+                }
+                $item->webDomainsShow = $array;
+            }
+            $item->backend_domain_url = fix_url($item->backend_domain, true);
         }
         $port = Sites::max('port') + 1;
         $domains = Domains::field('id, domain, site_id, remark')->select()->column(null, 'id');
-
         return $this->view('list', compact('list', 'siteStatus', 'domains', 'areas', 'port'));
     }
 

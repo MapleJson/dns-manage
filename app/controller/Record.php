@@ -25,20 +25,22 @@ class Record extends AdminController
     public function index()
     {
         $where = [];
+        $domainsWhere = [];
         if (!empty(input('get.domain_id'))) {
             $where['domain_id'] = input('get.domain_id');
         }
         if (!empty(input('get.site_id'))) {
             $where['site_id'] = input('get.site_id');
+            $domainsWhere['site_id'] = input('get.site_id');
         }
         $list = Records::getPageList($where);
         foreach ($list as &$item) {
             $item->domain = empty($item->domains) ? '' : $item->domains->domain;
             $item->site_name = empty($item->sites) ? '' : $item->sites->site_name;
-            $item->nameUrl = fix_url($item->name);
+            $item->nameUrl = fix_url($item->name, true);
         }
         $siteStatus = lang('siteStatus');
-        $domains = Domains::field('id, domain, remark, site_id')->order('site_id', 'asc')->select()->column(null, 'id');
+        $domains = Domains::field('id, domain, remark, site_id')->where($domainsWhere)->order('site_id', 'asc')->select()->column(null, 'id');
         $sites = Sites::field('id, site_name, status')->select()->column(null, 'id');
         return $this->view('list', compact('list', 'domains', 'sites', 'siteStatus'));
     }

@@ -16,6 +16,9 @@ class Deploy extends AdminController
         if (!empty(input('get.site_id'))) {
             $where[] = ['site_id', '=', intval(input('get.site_id'))];
         }
+        if (!empty(input('get.server_id'))) {
+            $where[] = ['server_id', '=', intval(input('get.server_id'))];
+        }
         $list = \app\model\Deploy::getPageList($where);
         $servers = Servers::field('id, server_name, type')->select()->column(null, 'id');
         $sites = Sites::field('id, site_name, deployed')->select()->column(null, 'id');
