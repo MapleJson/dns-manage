@@ -80,6 +80,7 @@
         <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#show-site" onclick="showUrl({$site})" type="button">查看域名</button>
         <a class="btn btn-info btn-sm" href="{:url('site-change-domain', ['id' => $site.id])}">修改域名</a>
         <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#add-site" onclick="showUpdate({$site})" type="button">编辑</button>
+        <a class="btn btn-danger btn-sm" href="{:url('site-rsync', ['id' => $site.id])}">同步</a>
         <a class="btn btn-danger btn-sm" href="{:url('site-delete', ['id' => $site.id])}">删除</a>
     </td>
 </tr>

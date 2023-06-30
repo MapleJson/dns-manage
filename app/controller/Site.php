@@ -6,6 +6,7 @@ namespace app\controller;
 use app\AdminController;
 use app\model\Domains;
 use app\model\Records;
+use app\model\Shell;
 use app\model\Sites;
 use app\model\Deploy;
 use app\service\CfServer;
@@ -55,6 +56,38 @@ class Site extends AdminController
         $port = Sites::max('port') + 1;
         $domains = Domains::field('id, domain, site_id, remark')->select()->column(null, 'id');
         return $this->view('list', compact('list', 'siteStatus', 'domains', 'areas', 'port'));
+    }
+
+    public function rsync()
+    {
+        if (!$this->permissions()) {
+            return message('无权操作');
+        }
+        $site = $this->model->getById(intval(input('get.id')));
+        if (!$site->isExists()) {
+            return message('The data does not exist');
+        }
+        if ($site->deployed == 0) {
+            return message('此站点未部署');
+        }
+        // 查询部署记录
+        $deploys = Deploy::where('site_id', $site->id)->select();
+        // 将后端部署host，站点ID，站点域名写入Nginx配置文件
+        $execs = [];
+        foreach ($deploys as $deploy) {
+            if ($deploy->server_type == 1) {
+                $execs[] = [
+                    'site_id' => $site->id,
+                    'shell' => "/usr/bin/rsync -vzrtopg --omit-dir-times --delete --exclude \".git\" --exclude \".gitignore\" --exclude \".env\" --exclude \"runtime\" {$site->base_path}/ root@{$deploy->servers->public_ip}:{$site->origin_path}/",
+                ];
+                $execs[] = [
+                    'site_id' => $site->id,
+                    'shell' => "ssh root@{$deploy->servers->public_ip} \"chown nginx.nginx {$site->origin_path} -R;nginx -s reload\"",
+                ];
+            }
+        }
+        (new Shell())->saveAll($execs);
+        return message('Rsync successfully', false);
     }
 
     public function changeWebDomains()

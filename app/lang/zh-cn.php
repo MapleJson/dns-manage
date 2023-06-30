@@ -29,6 +29,7 @@ return [
     'The admin does not exist'                    => '该管理员不存在',
     'Admin modified successfully'                 => '管理员修改成功',
     'Admin modification failed'                   => '管理员修改失败',
+    'Rsync successfully'                          => '请前往命令管理页面执行命令',
     'backend nginx conf'                          => <<<EOF
 server {
     listen       {:port};
