@@ -37,6 +37,9 @@ class Site extends AdminController
         if (!empty(input('get.status'))) {
             $where[] = ['status', '=', intval(input('get.status'))];
         }
+        if (!empty(input('get.area'))) {
+            $where[] = ['area', '=', intval(input('get.area'))];
+        }
         $list = Sites::getPageList($where, "FIELD(status,1,2,3) Desc,create_time Desc");
         $siteStatus = lang('siteStatus');
         $areas = lang('area');

@@ -25,6 +25,15 @@
                 {/volist}
             </select>
         </div>
+        <div class="col-md-2 mb-3">
+            <select class="form-control select2" name="area">
+                <option value="">区域</option>
+                {foreach $areas as $key => $area}
+                <option {if $Request.param.area == $key}selected{/if}
+                value="{$key}">{$area}</option>
+                {/foreach}
+            </select>
+        </div>
         <div class="col-md-1 mb-3">
             <select class="form-control select2" name="status">
                 <option value="">状态</option>
