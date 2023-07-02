@@ -24,7 +24,7 @@ class Shell extends AdminController
             $where['site_id'] = input('get.site_id');
         }
         $list = Exec::where($where)->order('id', 'asc')->paginate(20);
-        $sites = Sites::field('id, site_name')->select()->column(null, 'id');
+        $sites = Sites::field('id, site_name')->orderRaw('FIELD(status,1,2,3) Desc,id Desc')->select()->column(null, 'id');
         return $this->view('list', compact('list', 'sites'));
     }
 

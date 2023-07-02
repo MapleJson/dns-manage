@@ -41,7 +41,7 @@ class Record extends AdminController
         }
         $siteStatus = lang('siteStatus');
         $domains = Domains::field('id, domain, remark, site_id')->where($domainsWhere)->order('site_id', 'asc')->select()->column(null, 'id');
-        $sites = Sites::field('id, site_name, status')->select()->column(null, 'id');
+        $sites = Sites::field('id, site_name, status')->orderRaw('FIELD(status,1,2,3) Desc,id Desc')->select()->column(null, 'id');
         return $this->view('list', compact('list', 'domains', 'sites', 'siteStatus'));
     }
 

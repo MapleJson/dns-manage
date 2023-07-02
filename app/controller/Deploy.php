@@ -21,7 +21,7 @@ class Deploy extends AdminController
         }
         $list = \app\model\Deploy::getPageList($where);
         $servers = Servers::field('id, server_name, type')->select()->column(null, 'id');
-        $sites = Sites::field('id, site_name, deployed, status')->select()->column(null, 'id');
+        $sites = Sites::field('id, site_name, deployed, status')->orderRaw('FIELD(status,1,2,3) Desc,id Desc')->select()->column(null, 'id');
         $type = lang('type');
         $siteStatus = lang('siteStatus');
         return $this->view('list', compact('list', 'servers', 'sites', 'type', 'siteStatus'));
